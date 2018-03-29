@@ -8,6 +8,7 @@
 
 #import "ViewController.h"
 #import "BlockTracker.h"
+#import <objc/runtime.h>
 
 @interface ViewController ()
 
@@ -18,15 +19,19 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [mt_metaClass(UIView.self) bt_trackBlockArgOfSelector:@selector(animateWithDuration:animations:) callback:^(id  _Nonnull block, BlockTrackerCallBackType type, void * _Nonnull result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-
+    [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nonnull block, BlockTrackerCallBackType type, void * _Nonnull result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+        NSLog(@"xixi");
     }];
     
-    [UIView animateWithDuration:0.1 animations:^{
-        NSLog(@"hehe");
+    NSString *hehe = @"hehe";
+    [self performBlock:^{
+        NSLog(hehe);
     }];
 }
 
+- (void)performBlock:(void(^)(void))block {
+    block();
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

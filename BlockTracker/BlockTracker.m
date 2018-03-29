@@ -238,13 +238,20 @@ static void mt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
     }
     for (NSNumber *index in rule.blockArgIndex) {
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
-            id block;
+            __unsafe_unretained id block;
             [invocation getArgument:&block atIndex:index.integerValue];
+            __weak typeof(block) weakBlock = block;
+            __weak typeof(rule) weakRule = rule;
             [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHToken *token) {
-                rule.callback(block, BlockTrackerCallBackTypeInvoke, token.retValue, [NSThread callStackSymbols]);
+                __strong typeof(weakBlock) strongBlock = weakBlock;
+                __strong typeof(weakRule) strongRule = weakRule;
+                strongRule.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.retValue, [NSThread callStackSymbols]);
             }];
+            
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
-                rule.callback(block, BlockTrackerCallBackTypeDead, token.retValue, [NSThread callStackSymbols]);
+                __strong typeof(weakBlock) strongBlock = weakBlock;
+                __strong typeof(weakRule) strongRule = weakRule;
+                strongRule.callback(strongBlock, BlockTrackerCallBackTypeDead, token.retValue, [NSThread callStackSymbols]);
             }];
         }
     }
