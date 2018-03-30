@@ -16,6 +16,16 @@
 #error
 #endif
 
+struct BTInvocaton {
+    void *isa;
+    void *frame;
+    void *retdata;
+    void *signature;
+    void *container;
+    uint8_t retainedArgs;
+    uint8_t reserved[15];
+};
+
 static inline BOOL mt_object_isClass(id _Nullable obj)
 {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0 || __TV_OS_VERSION_MIN_REQUIRED >= __TVOS_9_0 || __WATCH_OS_VERSION_MIN_REQUIRED >= __WATCHOS_2_0 || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_10
@@ -236,6 +246,10 @@ static void mt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
     if (!rule) {
         rule = MTEngine.defaultEngine.rules[methodDescriptionForClass];
     }
+    [invocation retainArguments];
+//    void **invocationFrame = ((__bridge struct BTInvocaton *)invocation)->frame;
+//    void *blockArg = invocationFrame[2];
+    
     for (NSNumber *index in rule.blockArgIndex) {
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
@@ -247,7 +261,7 @@ static void mt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
                 __strong typeof(weakRule) strongRule = weakRule;
                 strongRule.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.retValue, [NSThread callStackSymbols]);
             }];
-            
+
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
                 __strong typeof(weakBlock) strongBlock = weakBlock;
                 __strong typeof(weakRule) strongRule = weakRule;

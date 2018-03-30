@@ -11,7 +11,7 @@
 #import <objc/runtime.h>
 
 @interface ViewController ()
-
+@property (nonatomic,strong) id block;
 @end
 
 @implementation ViewController
@@ -30,6 +30,7 @@
 }
 
 - (void)performBlock:(void(^)(void))block {
+//    self.block = block;
     block();
 }
 
