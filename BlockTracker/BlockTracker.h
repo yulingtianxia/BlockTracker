@@ -15,7 +15,7 @@ typedef NS_ENUM(NSUInteger, BlockTrackerCallBackType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^BlockTrackerCallbackBlock)(id block, BlockTrackerCallBackType type, void *result, NSArray<NSString *> *callStackSymbols);
+typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallBackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
 
 /**
  获取元类
@@ -23,15 +23,15 @@ typedef void(^BlockTrackerCallbackBlock)(id block, BlockTrackerCallBackType type
  @param cls 类对象
  @return 类对象的元类
  */
-Class mt_metaClass(Class cls);
+Class bt_metaClass(Class cls);
 
 /**
- 消息节流的规则。durationThreshold = 0.1，则代表 0.1 秒内最多发送一次消息，多余的消息会被忽略掉。
+ 消息节流的追踪者。durationThreshold = 0.1，则代表 0.1 秒内最多发送一次消息，多余的消息会被忽略掉。
  */
-@interface MTRule : NSObject
+@interface BTTracker : NSObject
 
 /**
- target, 可以为实例，类，元类(可以使用 mt_metaClass 函数获取元类）
+ target, 可以为实例，类，元类(可以使用 bt_metaClass 函数获取元类）
  */
 @property (nonatomic, weak, readonly) id target;
 
@@ -40,63 +40,27 @@ Class mt_metaClass(Class cls);
  */
 @property (nonatomic, readonly) SEL selector;
 
-
-
-- (instancetype)initWithTarget:(id)target selector:(SEL)selector NS_DESIGNATED_INITIALIZER;
-
-- (instancetype)init NS_UNAVAILABLE;
-
 /**
- 应用规则，会覆盖已有的规则
+ 停止追踪者
  
- @return 更新成功返回 YES；如果规则不合法或继承链上已有相同 selector 的规则，则返回 NO
+ @return 停止成功返回 YES；如果追踪者不存在或不合法，则返回 NO
  */
-- (BOOL)apply;
-
-/**
- 废除规则
- 
- @return 废除成功返回 YES；如果规则不存在或不合法，则返回 NO
- */
-- (BOOL)discard;
-
-@end
-
-@interface MTEngine : NSObject
-
-@property (nonatomic, class, readonly) MTEngine *defaultEngine;
-@property (nonatomic, readonly) NSArray<MTRule *> *allRules;
-
-/**
- 应用规则，会覆盖已有的规则
- 
- @param rule MTRule 对象
- @return 更新成功返回 YES；如果规则不合法或继承链上已有相同 selector 的规则，则返回 NO
- */
-- (BOOL)applyRule:(MTRule *)rule;
-
-/**
- 废除规则
- 
- @param rule MTRule 对象
- @return 废除成功返回 YES；如果规则不存在或不合法，则返回 NO
- */
-- (BOOL)discardRule:(MTRule *)rule;
+- (BOOL)stop;
 
 @end
 
 @interface NSObject (BlockTracker)
 
-@property (nonatomic, readonly) NSArray<MTRule *> *mt_allRules;
+@property (nonatomic, readonly) NSArray<BTTracker *> *bt_allTrackers;
 
 
 /**
  对方法调用限频
  
  @param selector 限频的方法
- @return 如果限频成功则返回规则对象，否则返回 nil
+ @return 如果限频成功则返回追踪者对象，否则返回 nil
  */
-- (nullable MTRule *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback;
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback;
 
 @end
 

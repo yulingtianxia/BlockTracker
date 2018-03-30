@@ -16,17 +16,7 @@
 #error
 #endif
 
-struct BTInvocaton {
-    void *isa;
-    void *frame;
-    void *retdata;
-    void *signature;
-    void *container;
-    uint8_t retainedArgs;
-    uint8_t reserved[15];
-};
-
-static inline BOOL mt_object_isClass(id _Nullable obj)
+static inline BOOL bt_object_isClass(id _Nullable obj)
 {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0 || __TV_OS_VERSION_MIN_REQUIRED >= __TVOS_9_0 || __WATCH_OS_VERSION_MIN_REQUIRED >= __WATCHOS_2_0 || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_10
     return object_isClass(obj);
@@ -36,7 +26,7 @@ static inline BOOL mt_object_isClass(id _Nullable obj)
 #endif
 }
 
-Class mt_metaClass(Class cls)
+Class bt_metaClass(Class cls)
 {
     if (class_isMetaClass(cls)) {
         return cls;
@@ -44,10 +34,10 @@ Class mt_metaClass(Class cls)
     return object_getClass(cls);
 }
 
-static NSString * mt_methodDescription(id target, SEL selector)
+static NSString * bt_methodDescription(id target, SEL selector)
 {
     NSString *selectorName = NSStringFromSelector(selector);
-    if (mt_object_isClass(target)) {
+    if (bt_object_isClass(target)) {
         NSString *className = NSStringFromClass(target);
         return [NSString stringWithFormat:@"%@ [%@ %@]", class_isMetaClass(target) ? @"+" : @"-", className, selectorName];
     }
@@ -56,32 +46,78 @@ static NSString * mt_methodDescription(id target, SEL selector)
     }
 }
 
-@interface MTDealloc : NSObject
+static const char *BHSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInteger *alignp, long *len)
+{
+    const char *out = NSGetSizeAndAlignment(str, sizep, alignp);
+    if(len)
+        *len = out - str;
+    while(isdigit(*out))
+        out++;
+    return out;
+}
 
-@property (nonatomic, weak) MTRule *rule;
+@interface BTDealloc : NSObject
+
+@property (nonatomic, weak) BTTracker *tracker;
 @property (nonatomic, copy) NSString *methodDescription;
 @property (nonatomic) Class cls;
 
 @end
 
-@implementation MTDealloc
-
-- (void)dealloc
-{
-    SEL selector = NSSelectorFromString(@"discardRule:whenTargetDealloc:");
-    ((void (*)(id, SEL, MTRule *, MTDealloc *))[MTEngine.defaultEngine methodForSelector:selector])(MTEngine.defaultEngine, selector, self.rule, self);
-}
-
-@end
-
-@interface MTRule ()
+@interface BTTracker ()
 
 @property (nonatomic) BlockTrackerCallbackBlock callback;
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector NS_DESIGNATED_INITIALIZER;
+- (instancetype)init NS_UNAVAILABLE;
+
+/**
+ 应用追踪者
+ 
+ @return 更新成功返回 YES；如果追踪者不合法或继承链上已有相同 selector 的追踪者，则返回 NO
+ */
+- (BOOL)apply;
+
 @end
 
-@implementation MTRule
+@interface BTEngine : NSObject
+
+@property (nonatomic, class, readonly) BTEngine *defaultEngine;
+@property (nonatomic) NSMutableDictionary<NSString *, BTTracker *> *trackers;
+
+/**
+ 应用追踪者
+ 
+ @param tracker BTTracker 对象
+ @return 更新成功返回 YES；如果追踪者不合法或继承链上已有相同 selector 的追踪者，则返回 NO
+ */
+- (BOOL)applyTracker:(BTTracker *)tracker;
+
+/**
+ 停止追踪者
+ 
+ @param tracker BTTracker 对象
+ @return 停止成功返回 YES；如果追踪者不存在或不合法，则返回 NO
+ */
+- (BOOL)stopTracker:(BTTracker *)tracker;
+
+- (void)stopTracker:(BTTracker *)tracker whenTargetDealloc:(BTDealloc *)btDealloc;
+
+@end
+
+
+@implementation BTDealloc
+
+- (void)dealloc
+{
+    SEL selector = NSSelectorFromString(@"stopTracker:whenTargetDealloc:");
+    ((void (*)(id, SEL, BTTracker *, BTDealloc *))[BTEngine.defaultEngine methodForSelector:selector])(BTEngine.defaultEngine, selector, self.tracker, self);
+}
+
+@end
+
+@implementation BTTracker
 
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector
 {
@@ -95,34 +131,26 @@ static NSString * mt_methodDescription(id target, SEL selector)
 
 - (BOOL)apply
 {
-    return [MTEngine.defaultEngine applyRule:self];
+    return [BTEngine.defaultEngine applyTracker:self];
 }
 
-- (BOOL)discard
+- (BOOL)stop
 {
-    return [MTEngine.defaultEngine discardRule:self];
+    return [BTEngine.defaultEngine stopTracker:self];
 }
 
 @end
 
-@interface MTEngine ()
-
-@property (nonatomic) NSMutableDictionary<NSString *, MTRule *> *rules;
-
-- (void)discardRule:(MTRule *)rule whenTargetDealloc:(MTDealloc *)mtDealloc;
-
-@end
-
-@implementation MTEngine
+@implementation BTEngine
 
 static pthread_mutex_t mutex;
 
 + (instancetype)defaultEngine
 {
     static dispatch_once_t onceToken;
-    static MTEngine *instance;
+    static BTEngine *instance;
     dispatch_once(&onceToken, ^{
-        instance = [MTEngine new];
+        instance = [BTEngine new];
     });
     return instance;
 }
@@ -131,38 +159,33 @@ static pthread_mutex_t mutex;
 {
     self = [super init];
     if (self) {
-        _rules = [NSMutableDictionary dictionary];
+        _trackers = [NSMutableDictionary dictionary];
         pthread_mutex_init(&mutex, NULL);
     }
     return self;
 }
 
-- (NSArray<MTRule *> *)allRules
-{
-    return [self.rules allValues];
-}
-
-- (BOOL)applyRule:(MTRule *)rule
+- (BOOL)applyTracker:(BTTracker *)tracker
 {
     pthread_mutex_lock(&mutex);
     __block BOOL shouldApply = YES;
-    if (mt_checkRuleValid(rule)) {
-        [self.rules enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, MTRule * _Nonnull obj, BOOL * _Nonnull stop) {
-            if (sel_isEqual(rule.selector, obj.selector)) {
+    if (bt_checkTrackerValid(tracker)) {
+        [self.trackers enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, BTTracker * _Nonnull obj, BOOL * _Nonnull stop) {
+            if (sel_isEqual(tracker.selector, obj.selector)) {
                 
-                Class clsA = mt_classOfTarget(rule.target);
-                Class clsB = mt_classOfTarget(obj.target);
+                Class clsA = bt_classOfTarget(tracker.target);
+                Class clsB = bt_classOfTarget(obj.target);
                 
                 shouldApply = !([clsA isSubclassOfClass:clsB] || [clsB isSubclassOfClass:clsA]);
                 *stop = shouldApply;
-                NSCAssert(shouldApply, @"Error: %@ already apply rule in %@. A message can only have one rule per class hierarchy.", NSStringFromSelector(obj.selector), NSStringFromClass(clsB));
+                NSCAssert(shouldApply, @"Error: %@ already apply tracker in %@. A message can only have one tracker per class hierarchy.", NSStringFromSelector(obj.selector), NSStringFromClass(clsB));
             }
         }];
         
         if (shouldApply) {
-            self.rules[mt_methodDescription(rule.target, rule.selector)] = rule;
-            mt_overrideMethod(rule.target, rule.selector);
-            mt_configureTargetDealloc(rule);
+            self.trackers[bt_methodDescription(tracker.target, tracker.selector)] = tracker;
+            bt_overrideMethod(tracker.target, tracker.selector);
+            bt_configureTargetDealloc(tracker);
         }
     }
     else {
@@ -172,49 +195,49 @@ static pthread_mutex_t mutex;
     return shouldApply;
 }
 
-- (BOOL)discardRule:(MTRule *)rule
+- (BOOL)stopTracker:(BTTracker *)tracker
 {
     pthread_mutex_lock(&mutex);
     BOOL shouldDiscard = NO;
-    if (mt_checkRuleValid(rule)) {
-        NSString *description = mt_methodDescription(rule.target, rule.selector);
-        shouldDiscard = self.rules[description] != nil;
+    if (bt_checkTrackerValid(tracker)) {
+        NSString *description = bt_methodDescription(tracker.target, tracker.selector);
+        shouldDiscard = self.trackers[description] != nil;
         if (shouldDiscard) {
-            self.rules[description] = nil;
-            mt_recoverMethod(rule.target, rule.selector);
+            self.trackers[description] = nil;
+            bt_recoverMethod(tracker.target, tracker.selector);
         }
     }
     pthread_mutex_unlock(&mutex);
     return shouldDiscard;
 }
 
-- (void)discardRule:(MTRule *)rule whenTargetDealloc:(MTDealloc *)mtDealloc
+- (void)stopTracker:(BTTracker *)tracker whenTargetDealloc:(BTDealloc *)btDealloc
 {
     pthread_mutex_lock(&mutex);
     
-    NSString *description = mtDealloc.methodDescription;
-    if (self.rules[description] != nil) {
-        self.rules[description] = nil;
-        if (MTEngine.defaultEngine.rules[mt_methodDescription(mtDealloc.cls, rule.selector)]) {
+    NSString *description = btDealloc.methodDescription;
+    if (self.trackers[description] != nil) {
+        self.trackers[description] = nil;
+        if (BTEngine.defaultEngine.trackers[bt_methodDescription(btDealloc.cls, tracker.selector)]) {
             return;
         }
-        mt_revertHook(mtDealloc.cls, rule.selector);
+        bt_revertHook(btDealloc.cls, tracker.selector);
     }
     pthread_mutex_unlock(&mutex);
 }
 
 #pragma mark - Private Helper
 
-static BOOL mt_checkRuleValid(MTRule *rule)
+static BOOL bt_checkTrackerValid(BTTracker *tracker)
 {
-    if (rule.target && rule.selector && rule.callback) {
-        NSString *selectorName = NSStringFromSelector(rule.selector);
+    if (tracker.target && tracker.selector && tracker.callback) {
+        NSString *selectorName = NSStringFromSelector(tracker.selector);
         if ([selectorName isEqualToString:@"forwardInvocation:"]) {
             return NO;
         }
-        Class cls = mt_classOfTarget(rule.target);
+        Class cls = bt_classOfTarget(tracker.target);
         NSString *className = NSStringFromClass(cls);
-        if ([className isEqualToString:@"MTRule"] || [className isEqualToString:@"MTEngine"]) {
+        if ([className isEqualToString:@"BTTracker"] || [className isEqualToString:@"BTEngine"]) {
             return NO;
         }
         return YES;
@@ -222,9 +245,9 @@ static BOOL mt_checkRuleValid(MTRule *rule)
     return NO;
 }
 
-static SEL mt_aliasForSelector(Class cls, SEL selector)
+static SEL bt_aliasForSelector(Class cls, SEL selector)
 {
-    NSString *fixedOriginalSelectorName = [NSString stringWithFormat:@"__mt_%@", NSStringFromSelector(selector)];
+    NSString *fixedOriginalSelectorName = [NSString stringWithFormat:@"__bt_%@", NSStringFromSelector(selector)];
     SEL fixedOriginalSelector = NSSelectorFromString(fixedOriginalSelectorName);
     return fixedOriginalSelector;
 }
@@ -237,35 +260,33 @@ static SEL mt_aliasForSelector(Class cls, SEL selector)
  @param invocation NSInvocation 对象
  @param fixedSelector 修正后的 SEL
  */
-static void mt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
+static void bt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
 {
-    NSString *methodDescriptionForInstance = mt_methodDescription(invocation.target, invocation.selector);
-    NSString *methodDescriptionForClass = mt_methodDescription(object_getClass(invocation.target), invocation.selector);
+    NSString *methodDescriptionForInstance = bt_methodDescription(invocation.target, invocation.selector);
+    NSString *methodDescriptionForClass = bt_methodDescription(object_getClass(invocation.target), invocation.selector);
     
-    MTRule *rule = MTEngine.defaultEngine.rules[methodDescriptionForInstance];
-    if (!rule) {
-        rule = MTEngine.defaultEngine.rules[methodDescriptionForClass];
+    BTTracker *tracker = BTEngine.defaultEngine.trackers[methodDescriptionForInstance];
+    if (!tracker) {
+        tracker = BTEngine.defaultEngine.trackers[methodDescriptionForClass];
     }
-    [invocation retainArguments];
-//    void **invocationFrame = ((__bridge struct BTInvocaton *)invocation)->frame;
-//    void *blockArg = invocationFrame[2];
     
-    for (NSNumber *index in rule.blockArgIndex) {
+    [invocation retainArguments];
+    
+    for (NSNumber *index in tracker.blockArgIndex) {
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
             [invocation getArgument:&block atIndex:index.integerValue];
             __weak typeof(block) weakBlock = block;
-            __weak typeof(rule) weakRule = rule;
+            __weak typeof(tracker) weakTracker = tracker;
             [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHToken *token) {
                 __strong typeof(weakBlock) strongBlock = weakBlock;
-                __strong typeof(weakRule) strongRule = weakRule;
-                strongRule.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.retValue, [NSThread callStackSymbols]);
+                __strong typeof(weakTracker) strongTracker = weakTracker;
+                strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.args, token.retValue, [NSThread callStackSymbols]);
             }];
 
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
-                __strong typeof(weakBlock) strongBlock = weakBlock;
-                __strong typeof(weakRule) strongRule = weakRule;
-                strongRule.callback(strongBlock, BlockTrackerCallBackTypeDead, token.retValue, [NSThread callStackSymbols]);
+                __strong typeof(weakTracker) strongTracker = weakTracker;
+                strongTracker.callback(nil, BlockTrackerCallBackTypeDead, nil, nil, [NSThread callStackSymbols]);
             }];
         }
     }
@@ -273,23 +294,23 @@ static void mt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
     [invocation invoke];
 }
 
-static void mt_forwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
+static void bt_forwardInvocation(__unsafe_unretained id assignSlf, SEL selector, NSInvocation *invocation)
 {
     SEL originalSelector = invocation.selector;
-    SEL fixedOriginalSelector = mt_aliasForSelector(object_getClass(assignSlf), originalSelector);
+    SEL fixedOriginalSelector = bt_aliasForSelector(object_getClass(assignSlf), originalSelector);
     if (![assignSlf respondsToSelector:fixedOriginalSelector]) {
-        mt_executeOrigForwardInvocation(assignSlf, selector, invocation);
+        bt_executeOrigForwardInvocation(assignSlf, selector, invocation);
         return;
     }
-    mt_handleInvocation(invocation, fixedOriginalSelector);
+    bt_handleInvocation(invocation, fixedOriginalSelector);
 }
 
-static NSString *const MTForwardInvocationSelectorName = @"__mt_forwardInvocation:";
+static NSString *const BTForwardInvocationSelectorName = @"__bt_forwardInvocation:";
 
-static Class mt_classOfTarget(id target)
+static Class bt_classOfTarget(id target)
 {
     Class cls;
-    if (mt_object_isClass(target)) {
+    if (bt_object_isClass(target)) {
         cls = target;
     }
     else {
@@ -298,9 +319,9 @@ static Class mt_classOfTarget(id target)
     return cls;
 }
 
-static void mt_overrideMethod(id target, SEL selector)
+static void bt_overrideMethod(id target, SEL selector)
 {
-    Class cls = mt_classOfTarget(target);
+    Class cls = bt_classOfTarget(target);
     
     Method originMethod = class_getInstanceMethod(cls, selector);
     if (!originMethod) {
@@ -332,15 +353,15 @@ static void mt_overrideMethod(id target, SEL selector)
         return;
     }
     
-    if (class_getMethodImplementation(cls, @selector(forwardInvocation:)) != (IMP)mt_forwardInvocation) {
-        IMP originalForwardImp = class_replaceMethod(cls, @selector(forwardInvocation:), (IMP)mt_forwardInvocation, "v@:@");
+    if (class_getMethodImplementation(cls, @selector(forwardInvocation:)) != (IMP)bt_forwardInvocation) {
+        IMP originalForwardImp = class_replaceMethod(cls, @selector(forwardInvocation:), (IMP)bt_forwardInvocation, "v@:@");
         if (originalForwardImp) {
-            class_addMethod(cls, NSSelectorFromString(MTForwardInvocationSelectorName), originalForwardImp, "v@:@");
+            class_addMethod(cls, NSSelectorFromString(BTForwardInvocationSelectorName), originalForwardImp, "v@:@");
         }
     }
     
     if (class_respondsToSelector(cls, selector)) {
-        SEL fixedOriginalSelector = mt_aliasForSelector(cls, selector);
+        SEL fixedOriginalSelector = bt_aliasForSelector(cls, selector);
         if(!class_respondsToSelector(cls, fixedOriginalSelector)) {
             class_addMethod(cls, fixedOriginalSelector, originalImp, originType);
         }
@@ -351,10 +372,10 @@ static void mt_overrideMethod(id target, SEL selector)
     class_replaceMethod(cls, selector, msgForwardIMP, originType);
 }
 
-static void mt_revertHook(Class cls, SEL selector)
+static void bt_revertHook(Class cls, SEL selector)
 {
-    if (class_getMethodImplementation(cls, @selector(forwardInvocation:)) == (IMP)mt_forwardInvocation) {
-        IMP originalForwardImp = class_getMethodImplementation(cls, NSSelectorFromString(MTForwardInvocationSelectorName));
+    if (class_getMethodImplementation(cls, @selector(forwardInvocation:)) == (IMP)bt_forwardInvocation) {
+        IMP originalForwardImp = class_getMethodImplementation(cls, NSSelectorFromString(BTForwardInvocationSelectorName));
         if (originalForwardImp) {
             class_replaceMethod(cls, @selector(forwardInvocation:), originalForwardImp, "v@:@");
         }
@@ -370,31 +391,31 @@ static void mt_revertHook(Class cls, SEL selector)
     }
     const char *originType = (char *)method_getTypeEncoding(originMethod);
     
-    SEL fixedOriginalSelector = mt_aliasForSelector(cls, selector);
+    SEL fixedOriginalSelector = bt_aliasForSelector(cls, selector);
     if (class_respondsToSelector(cls, fixedOriginalSelector)) {
         IMP originalImp = class_getMethodImplementation(cls, fixedOriginalSelector);
         class_replaceMethod(cls, selector, originalImp, originType);
     }
 }
 
-static void mt_recoverMethod(id target, SEL selector)
+static void bt_recoverMethod(id target, SEL selector)
 {
     Class cls;
-    if (mt_object_isClass(target)) {
+    if (bt_object_isClass(target)) {
         cls = target;
     }
     else {
         cls = object_getClass(target);
-        if (MTEngine.defaultEngine.rules[mt_methodDescription(cls, selector)]) {
+        if (BTEngine.defaultEngine.trackers[bt_methodDescription(cls, selector)]) {
             return;
         }
     }
-    mt_revertHook(cls, selector);
+    bt_revertHook(cls, selector);
 }
 
-static void mt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *invocation)
+static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *invocation)
 {
-    SEL origForwardSelector = NSSelectorFromString(MTForwardInvocationSelectorName);
+    SEL origForwardSelector = NSSelectorFromString(BTForwardInvocationSelectorName);
     
     if ([slf respondsToSelector:origForwardSelector]) {
         NSMethodSignature *methodSignature = [slf methodSignatureForSelector:origForwardSelector];
@@ -416,52 +437,42 @@ static void mt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
     }
 }
 
-static void mt_configureTargetDealloc(MTRule *rule)
+static void bt_configureTargetDealloc(BTTracker *tracker)
 {
-    if (mt_object_isClass(rule.target)) {
+    if (bt_object_isClass(tracker.target)) {
         return;
     }
     else {
-        Class cls = object_getClass(rule.target);
-        MTDealloc *mtDealloc = objc_getAssociatedObject(rule.target, rule.selector);
-        if (!mtDealloc) {
-            mtDealloc = [MTDealloc new];
-            mtDealloc.rule = rule;
-            mtDealloc.methodDescription = mt_methodDescription(rule.target, rule.selector);
-            mtDealloc.cls = cls;
-            objc_setAssociatedObject(rule.target, rule.selector, mtDealloc, OBJC_ASSOCIATION_RETAIN);
+        Class cls = object_getClass(tracker.target);
+        BTDealloc *btDealloc = objc_getAssociatedObject(tracker.target, tracker.selector);
+        if (!btDealloc) {
+            btDealloc = [BTDealloc new];
+            btDealloc.tracker = tracker;
+            btDealloc.methodDescription = bt_methodDescription(tracker.target, tracker.selector);
+            btDealloc.cls = cls;
+            objc_setAssociatedObject(tracker.target, tracker.selector, btDealloc, OBJC_ASSOCIATION_RETAIN);
         }
     }
 }
 
 @end
 
-static const char *BHSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInteger *alignp, long *len)
-{
-    const char *out = NSGetSizeAndAlignment(str, sizep, alignp);
-    if(len)
-        *len = out - str;
-    while(isdigit(*out))
-        out++;
-    return out;
-}
-
 @implementation NSObject (BlockTracker)
 
-- (NSArray<MTRule *> *)mt_allRules
+- (NSArray<BTTracker *> *)bt_allTrackers
 {
-    NSMutableArray<MTRule *> *result = [NSMutableArray array];
-    for (MTRule *rule in MTEngine.defaultEngine.allRules) {
-        if (rule.target == self || object_getClass(self) == rule.target) {
-            [result addObject:rule];
+    NSMutableArray<BTTracker *> *result = [NSMutableArray array];
+    for (BTTracker *tracker in BTEngine.defaultEngine.trackers.allValues) {
+        if (tracker.target == self || object_getClass(self) == tracker.target) {
+            [result addObject:tracker];
         }
     }
     return [result copy];
 }
 
-- (nullable MTRule *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback
 {
-    Class cls = mt_classOfTarget(self);
+    Class cls = bt_classOfTarget(self);
     
     Method originMethod = class_getInstanceMethod(cls, selector);
     if (!originMethod) {
@@ -482,13 +493,13 @@ static const char *BHSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
         argIndex++;
     }
 
-    MTRule *rule = MTEngine.defaultEngine.rules[mt_methodDescription(self, selector)];
-    if (!rule) {
-        rule = [[MTRule alloc] initWithTarget:self selector:selector];
-        rule.callback = callback;
-        rule.blockArgIndex = [blockArgIndex copy];
+    BTTracker *tracker = BTEngine.defaultEngine.trackers[bt_methodDescription(self, selector)];
+    if (!tracker) {
+        tracker = [[BTTracker alloc] initWithTarget:self selector:selector];
+        tracker.callback = callback;
+        tracker.blockArgIndex = [blockArgIndex copy];
     }
-    return [rule apply] ? rule : nil;
+    return [tracker apply] ? tracker : nil;
 }
 
 @end

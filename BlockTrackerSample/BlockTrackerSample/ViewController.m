@@ -19,7 +19,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.
-    [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nonnull block, BlockTrackerCallBackType type, void * _Nonnull result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+    [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id _Nullable block, BlockTrackerCallBackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
         NSLog(@"xixi");
     }];
     
