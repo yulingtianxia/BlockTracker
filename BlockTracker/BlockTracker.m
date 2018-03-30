@@ -69,8 +69,7 @@ static const char *BHSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
 @property (nonatomic) BlockTrackerCallbackBlock callback;
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 
-- (instancetype)initWithTarget:(id)target selector:(SEL)selector NS_DESIGNATED_INITIALIZER;
-- (instancetype)init NS_UNAVAILABLE;
+- (instancetype)initWithTarget:(id)target selector:(SEL)selector;
 
 /**
  应用追踪者

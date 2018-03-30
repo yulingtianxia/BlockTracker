@@ -41,7 +41,7 @@ Class bt_metaClass(Class cls);
 @property (nonatomic, readonly) SEL selector;
 
 /**
- 停止追踪者
+ 停止继续追踪新的方法调用传入的 block 参数，已追踪的 block 依然生效
  
  @return 停止成功返回 YES；如果追踪者不存在或不合法，则返回 NO
  */

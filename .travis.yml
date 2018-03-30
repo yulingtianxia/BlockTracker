@@ -1,0 +1,23 @@
+osx_image: xcode9.2
+language: objective-c
+xcode_project: BlockTrackerSample
+xcode_scheme: BlockTrackerKit
+xcode_sdk: iphoneos11.2
+env:
+  global:
+  - FRAMEWORK_NAME=BlockTrackerKit
+before_install:
+- brew update
+- brew outdated carthage || brew upgrade carthage
+before_script:
+before_deploy:
+- carthage build --no-skip-current
+- carthage archive $FRAMEWORK_NAME
+script: xcodebuild -project BlockTrackerSample/BlockTrackerSample.xcodeproj -scheme BlockTrackerKit -configuration Release
+deploy:
+  provider: releases
+  file: BlockTrackerKit.framework.zip
+  skip_cleanup: true
+  on:
+    repo: yulingtianxia/BlockTracker
+    tags: true
