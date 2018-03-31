@@ -11,33 +11,33 @@
 #import <objc/runtime.h>
 
 @interface ViewController ()
-@property (nonatomic,strong) id block;
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view, typically from a nib.
-    [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id _Nullable block, BlockTrackerCallBackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-        NSLog(@"xixi");
+    // Begin Track
+    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id _Nullable block, BlockTrackerCallBackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+        NSLog(@"%@", BlockTrackerCallBackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead");
     }];
-    
-    NSString *hehe = @"hehe";
+    // invoke blocks
+    __block NSString *word = @"I'm a block";
     [self performBlock:^{
-        NSLog(hehe);
+        NSLog(@"add '!!!' to word");
+        word = [word stringByAppendingString:@"!!!"];
     }];
+    [self performBlock:^{
+        NSLog(@"%@", word);
+    }];
+    // stop tracker in future
+//    [tracker stop];
+    // blocks will die
 }
 
 - (void)performBlock:(void(^)(void))block {
-//    self.block = block;
     block();
 }
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
 
 @end

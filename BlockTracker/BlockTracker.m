@@ -280,12 +280,16 @@ static void bt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
             [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHToken *token) {
                 __strong typeof(weakBlock) strongBlock = weakBlock;
                 __strong typeof(weakTracker) strongTracker = weakTracker;
-                strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.args, token.retValue, [NSThread callStackSymbols]);
+                if (strongTracker.callback) {
+                    strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.args, token.retValue, [NSThread callStackSymbols]);
+                }
             }];
 
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
                 __strong typeof(weakTracker) strongTracker = weakTracker;
-                strongTracker.callback(nil, BlockTrackerCallBackTypeDead, nil, nil, [NSThread callStackSymbols]);
+                if (strongTracker.callback) {
+                    strongTracker.callback(nil, BlockTrackerCallBackTypeDead, nil, nil, [NSThread callStackSymbols]);
+                }
             }];
         }
     }
