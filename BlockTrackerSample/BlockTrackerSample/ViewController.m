@@ -38,7 +38,7 @@
 
 - (void)performBlock:(void(^)(void))block {
     block();
-    block();
+//    block();
 }
 
 @end

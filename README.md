@@ -30,8 +30,9 @@ You can track blocks in arguments. This method returns a `BTTracker` instance fo
 ```
 - (void)viewDidLoad {
     [super viewDidLoad];
-    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id _Nullable block, BlockTrackerCallBackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-        NSLog(@"%@", BlockTrackerCallBackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead");
+    // Begin Track
+    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallBackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+        NSLog(@"%@ invoke count = %ld", BlockTrackerCallBackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead", (long)invokeCount);
     }];
     // invoke blocks
     __block NSString *word = @"I'm a block";
@@ -49,6 +50,7 @@ You can track blocks in arguments. This method returns a `BTTracker` instance fo
 
 - (void)performBlock:(void(^)(void))block {
     block();
+//    block();
 }
 
 @end
@@ -58,11 +60,11 @@ Here is the log:
 
 ```
 add '!!!' to word
-BlockTrackerCallBackTypeInvoke
+BlockTrackerCallBackTypeInvoke invoke count = 1
 I'm a block!!!
-BlockTrackerCallBackTypeInvoke
-BlockTrackerCallBackTypeDead
-BlockTrackerCallBackTypeDead
+BlockTrackerCallBackTypeInvoke invoke count = 1
+BlockTrackerCallBackTypeDead invoke count = 1
+BlockTrackerCallBackTypeDead invoke count = 1
 ```
 
 ## 📲 Installation
