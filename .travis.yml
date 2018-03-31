@@ -13,7 +13,6 @@ before_install:
 before_script:
 - carthage bootstrap
 before_deploy:
-- carthage update
 - carthage build --no-skip-current
 - carthage archive $FRAMEWORK_NAME
 script: xcodebuild -project BlockTrackerSample/BlockTrackerSample.xcodeproj -scheme

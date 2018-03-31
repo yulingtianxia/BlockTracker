@@ -277,18 +277,27 @@ static void bt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
             [invocation getArgument:&block atIndex:index.integerValue];
             __weak typeof(block) weakBlock = block;
             __weak typeof(tracker) weakTracker = tracker;
-            [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHToken *token) {
+            BHToken *tokenAfter = [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHToken *token) {
                 __strong typeof(weakBlock) strongBlock = weakBlock;
                 __strong typeof(weakTracker) strongTracker = weakTracker;
+                NSNumber *invokeCount = objc_getAssociatedObject(token, NSSelectorFromString(@"invokeCount"));
+                if (!invokeCount) {
+                    invokeCount = @(1);
+                }
+                else {
+                    invokeCount = [NSNumber numberWithInt:invokeCount.intValue + 1];
+                }
+                objc_setAssociatedObject(token, NSSelectorFromString(@"invokeCount"), invokeCount, OBJC_ASSOCIATION_RETAIN);
                 if (strongTracker.callback) {
-                    strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, token.args, token.retValue, [NSThread callStackSymbols]);
+                    strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, invokeCount.intValue, token.args, token.retValue, [NSThread callStackSymbols]);
                 }
             }];
 
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
                 __strong typeof(weakTracker) strongTracker = weakTracker;
+                NSNumber *invokeCount = objc_getAssociatedObject(tokenAfter, NSSelectorFromString(@"invokeCount"));
                 if (strongTracker.callback) {
-                    strongTracker.callback(nil, BlockTrackerCallBackTypeDead, nil, nil, [NSThread callStackSymbols]);
+                    strongTracker.callback(nil, BlockTrackerCallBackTypeDead, invokeCount.intValue, nil, nil, [NSThread callStackSymbols]);
                 }
             }];
         }

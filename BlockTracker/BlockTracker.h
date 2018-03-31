@@ -15,7 +15,17 @@ typedef NS_ENUM(NSUInteger, BlockTrackerCallBackType) {
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallBackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
+/**
+ 追踪回调
+
+ @param block 被追踪的 block
+ @param type  追踪到的类型：Invoke 或 Dead
+ @param invokeCount block 参数被执行过的次数
+ @param args InvokeType 下为这次执行传入 block 的参数；DeadType 下为空
+ @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
+ @param callStackSymbols 堆栈信息
+ */
+typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallBackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
 
 /**
  获取元类
