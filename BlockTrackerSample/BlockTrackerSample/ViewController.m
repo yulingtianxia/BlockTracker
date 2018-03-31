@@ -19,8 +19,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Begin Track
-    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallBackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-        NSLog(@"%@ invoke count = %ld", BlockTrackerCallBackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead", (long)invokeCount);
+    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+        NSLog(@"%@ invoke count = %ld", BlockTrackerCallbackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead", (long)invokeCount);
     }];
     // invoke blocks
     __block NSString *word = @"I'm a block";
@@ -31,6 +31,7 @@
     [self performBlock:^{
         NSLog(@"%@", word);
     }];
+
     // stop tracker in future
 //    [tracker stop];
     // blocks will die

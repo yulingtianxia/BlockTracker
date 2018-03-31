@@ -289,7 +289,7 @@ static void bt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
                 }
                 objc_setAssociatedObject(token, NSSelectorFromString(@"invokeCount"), invokeCount, OBJC_ASSOCIATION_RETAIN);
                 if (strongTracker.callback) {
-                    strongTracker.callback(strongBlock, BlockTrackerCallBackTypeInvoke, invokeCount.intValue, token.args, token.retValue, [NSThread callStackSymbols]);
+                    strongTracker.callback(strongBlock, BlockTrackerCallbackTypeInvoke, invokeCount.intValue, token.args, token.retValue, [NSThread callStackSymbols]);
                 }
             }];
 
@@ -297,7 +297,7 @@ static void bt_handleInvocation(NSInvocation *invocation, SEL fixedSelector)
                 __strong typeof(weakTracker) strongTracker = weakTracker;
                 NSNumber *invokeCount = objc_getAssociatedObject(tokenAfter, NSSelectorFromString(@"invokeCount"));
                 if (strongTracker.callback) {
-                    strongTracker.callback(nil, BlockTrackerCallBackTypeDead, invokeCount.intValue, nil, nil, [NSThread callStackSymbols]);
+                    strongTracker.callback(nil, BlockTrackerCallbackTypeDead, invokeCount.intValue, nil, nil, [NSThread callStackSymbols]);
                 }
             }];
         }

@@ -8,9 +8,9 @@
 
 #import <Foundation/Foundation.h>
 
-typedef NS_ENUM(NSUInteger, BlockTrackerCallBackType) {
-    BlockTrackerCallBackTypeInvoke,
-    BlockTrackerCallBackTypeDead,
+typedef NS_ENUM(NSUInteger, BlockTrackerCallbackType) {
+    BlockTrackerCallbackTypeInvoke,
+    BlockTrackerCallbackTypeDead,
 };
 
 NS_ASSUME_NONNULL_BEGIN
@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
  @param callStackSymbols 堆栈信息
  */
-typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallBackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
+typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
 
 /**
  获取元类

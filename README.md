@@ -15,13 +15,16 @@ BlockTracker can track block arguments of a method. It's based on [BlockHook](ht
 
 ## 📚 Article
 
-
+[追踪 Objective-C 方法中的 Block 参数对象](http://yulingtianxia.com/blog/2018/03/31/Track-Block-Arguments-of-Objective-C-Method/)
 
 ## 🌟 Features
 
 - [x] Easy to use.
 - [x] Keep your code clear.
 - [x] Reserve the whole arguments.
+- [x] Get return value.
+- [x] Get invoke count. 
+- [x] Trace all block args of method.
 - [x] Self-managed trackers.
 - [x] Support Carthage.
 
@@ -37,8 +40,8 @@ You can track blocks in arguments. This method returns a `BTTracker` instance fo
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Begin Track
-    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallBackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-        NSLog(@"%@ invoke count = %ld", BlockTrackerCallBackTypeInvoke == type ? @"BlockTrackerCallBackTypeInvoke" : @"BlockTrackerCallBackTypeDead", (long)invokeCount);
+    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
+        NSLog(@"%@ invoke count = %ld", BlockTrackerCallbackTypeInvoke == type ? @"BlockTrackerCallbackTypeInvoke" : @"BlockTrackerCallbackTypeDead", (long)invokeCount);
     }];
     // invoke blocks
     __block NSString *word = @"I'm a block";
@@ -66,11 +69,11 @@ Here is the log:
 
 ```
 add '!!!' to word
-BlockTrackerCallBackTypeInvoke invoke count = 1
+BlockTrackerCallbackTypeInvoke invoke count = 1
 I'm a block!!!
-BlockTrackerCallBackTypeInvoke invoke count = 1
-BlockTrackerCallBackTypeDead invoke count = 1
-BlockTrackerCallBackTypeDead invoke count = 1
+BlockTrackerCallbackTypeInvoke invoke count = 1
+BlockTrackerCallbackTypeDead invoke count = 1
+BlockTrackerCallbackTypeDead invoke count = 1
 ```
 
 ## 📲 Installation
