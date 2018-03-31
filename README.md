@@ -5,7 +5,7 @@
 
 # BlockTracker
 
-BlockTracker can track block arguments of a method. It's based on [BlockTracker](https://github.com/yulingtianxia/BlockTracker).
+BlockTracker can track block arguments of a method. It's based on [BlockHook](https://github.com/yulingtianxia/BlockHook).
 
 ## 📚 Article
 
