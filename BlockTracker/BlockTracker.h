@@ -25,7 +25,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
  @param callStackSymbols 堆栈信息
  */
-typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols);
+typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols, NSString *mangleName);
 
 /**
  获取元类
@@ -36,7 +36,7 @@ typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallbac
 Class bt_metaClass(Class cls);
 
 /**
- 消息节流的追踪者。durationThreshold = 0.1，则代表 0.1 秒内最多发送一次消息，多余的消息会被忽略掉。
+ 消息参数中 block 的追踪者。
  */
 @interface BTTracker : NSObject
 
@@ -46,7 +46,7 @@ Class bt_metaClass(Class cls);
 @property (nonatomic, weak, readonly) id target;
 
 /**
- 节流消息的 SEL
+ 追踪消息的 SEL
  */
 @property (nonatomic, readonly) SEL selector;
 
@@ -65,10 +65,10 @@ Class bt_metaClass(Class cls);
 
 
 /**
- 对方法调用限频
+ 追踪方法调用中的 block 参数
  
- @param selector 限频的方法
- @return 如果限频成功则返回追踪者对象，否则返回 nil
+ @param selector 追踪 block 参数所属的方法
+ @return 如果追踪成功则返回追踪者对象，否则返回 nil
  */
 - (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback;
 
