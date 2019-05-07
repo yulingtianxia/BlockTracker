@@ -7,7 +7,7 @@
 //
 
 #import "BlockTracker.h"
-#import <BlockHookKit/BlockHookKit.h>
+@import BlockHook;
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread.h>
