@@ -49,6 +49,10 @@ Class bt_metaClass(Class cls);
  追踪消息的 SEL
  */
 @property (nonatomic, readonly) SEL selector;
+/**
+ 追踪是否在生效。
+ */
+@property (nonatomic, readonly, getter=isActive) BOOL active;
 
 /**
  停止继续追踪新的方法调用传入的 block 参数，已追踪的 block 依然生效
