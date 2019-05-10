@@ -7,23 +7,22 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		A41F8F4D2281B78A00EF6553 /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; };
-		A41F8F4E2281B78A00EF6553 /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		A41F8F572281BA3900EF6553 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
-		A41F8F582281BAE100EF6553 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
-		A41F8F592281BAE100EF6553 /* BlockHook.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A44BACE3206BD07B007BE529 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACE2206BD07B007BE529 /* AppDelegate.m */; };
 		A44BACE6206BD07B007BE529 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACE5206BD07B007BE529 /* ViewController.m */; };
 		A44BACE9206BD07B007BE529 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A44BACE7206BD07B007BE529 /* Main.storyboard */; };
 		A44BACEB206BD07B007BE529 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A44BACEA206BD07B007BE529 /* Assets.xcassets */; };
 		A44BACEE206BD07B007BE529 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A44BACEC206BD07B007BE529 /* LaunchScreen.storyboard */; };
 		A44BACF1206BD07B007BE529 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACF0206BD07B007BE529 /* main.m */; };
+		A45040122285B47400DAFA1D /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
+		A45040162285B5EC00DAFA1D /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; };
+		A45040172285B5EC00DAFA1D /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A45040382285B6B000DAFA1D /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
 		A47059F9206E955300162FA7 /* BlockTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACF9206BD0D2007BE529 /* BlockTracker.m */; };
 		A47059FA206E955900162FA7 /* BlockTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = A44BACF8206BD0D2007BE529 /* BlockTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		A41F8F4F2281B78A00EF6553 /* PBXContainerItemProxy */ = {
+		A45040182285B5EC00DAFA1D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
 			proxyType = 1;
@@ -33,14 +32,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		A41F8F512281B78A00EF6553 /* Embed Frameworks */ = {
+		A450401A2285B5EC00DAFA1D /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				A41F8F4E2281B78A00EF6553 /* BlockTracker.framework in Embed Frameworks */,
-				A41F8F592281BAE100EF6553 /* BlockHook.framework in Embed Frameworks */,
+				A45040172285B5EC00DAFA1D /* BlockTracker.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -70,8 +68,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A41F8F4D2281B78A00EF6553 /* BlockTracker.framework in Frameworks */,
-				A41F8F582281BAE100EF6553 /* BlockHook.framework in Frameworks */,
+				A45040162285B5EC00DAFA1D /* BlockTracker.framework in Frameworks */,
+				A45040382285B6B000DAFA1D /* BlockHook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -79,7 +77,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A41F8F572281BA3900EF6553 /* BlockHook.framework in Frameworks */,
+				A45040122285B47400DAFA1D /* BlockHook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,12 +158,13 @@
 				A44BACDA206BD07B007BE529 /* Sources */,
 				A44BACDB206BD07B007BE529 /* Frameworks */,
 				A44BACDC206BD07B007BE529 /* Resources */,
-				A41F8F512281B78A00EF6553 /* Embed Frameworks */,
+				A45040132285B4C800DAFA1D /* ShellScript */,
+				A450401A2285B5EC00DAFA1D /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				A41F8F502281B78A00EF6553 /* PBXTargetDependency */,
+				A45040192285B5EC00DAFA1D /* PBXTargetDependency */,
 			);
 			name = "BlockTrackerSample iOS";
 			productName = BlockTrackerSample;
@@ -248,6 +247,28 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		A45040132285B4C800DAFA1D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/BlockHook.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/BlockHook.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		A44BACDA206BD07B007BE529 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -270,10 +291,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		A41F8F502281B78A00EF6553 /* PBXTargetDependency */ = {
+		A45040192285B5EC00DAFA1D /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = A47059EC206E94F200162FA7 /* BlockTracker iOS */;
-			targetProxy = A41F8F4F2281B78A00EF6553 /* PBXContainerItemProxy */;
+			targetProxy = A45040182285B5EC00DAFA1D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
