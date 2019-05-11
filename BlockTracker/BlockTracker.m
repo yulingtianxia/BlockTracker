@@ -415,7 +415,9 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
         [invocation invoke];
         return;
     }
-    // TODO: ignore block already hooked
+    
+    [invocation retainArguments];
+    // TODO: ignore block already hooked; 
     for (NSNumber *index in tracker.blockArgIndex) {
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
