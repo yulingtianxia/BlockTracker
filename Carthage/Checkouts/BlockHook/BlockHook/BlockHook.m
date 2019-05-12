@@ -11,6 +11,10 @@
 #import <objc/runtime.h>
 #import <dlfcn.h>
 
+#if !__has_feature(objc_arc)
+#error
+#endif
+
 enum {
     BLOCK_HAS_COPY_DISPOSE =  (1 << 25),
     BLOCK_HAS_CTOR =          (1 << 26), // helpers have C++ code
@@ -62,7 +66,7 @@ struct _BHBlock
 }
 @property (nonatomic, readwrite) BlockHookMode mode;
 @property (nonatomic) NSMutableArray *allocations;
-@property (nonatomic, weak) id block;
+@property (nonatomic, weak, readwrite) id block;
 @property (nonatomic) NSUInteger numberOfArguments;
 @property (nonatomic) id hookBlock;
 @property (nonatomic, nullable, readwrite) NSString *mangleName;
@@ -73,6 +77,7 @@ struct _BHBlock
  */
 @property (nonatomic, getter=isStackBlock) BOOL stackBlock;
 @property (nonatomic, getter=hasStret) BOOL stret;
+@property (nonatomic, nullable, readwrite) BHToken *next;
 
 - (id)initWithBlock:(id)block;
 - (void)invokeOriginalBlockWithArgs:(void **)args retValue:(void *)retValue;
@@ -106,10 +111,16 @@ struct _BHBlock
         _originalBlockSignature = [NSMethodSignature signatureWithObjCTypes:BHBlockTypeEncodeString(block)];
         _closure = ffi_closure_alloc(sizeof(ffi_closure), &_replacementInvoke);
         _numberOfArguments = [self _prepCIF:&_cif withEncodeString:BHBlockTypeEncodeString(_block)];
+        
+        if ([block isKindOfClass:NSClassFromString(@"__NSStackBlock")]) {
+            NSLog(@"Hooking StackBlock causes a memory leak! I suggest you copy it first!");
+            self.stackBlock = YES;
+        }
+        
         BHDealloc *bhDealloc = [BHDealloc new];
         bhDealloc.token = self;
-        objc_setAssociatedObject(block, NSSelectorFromString([NSString stringWithFormat:@"%p", self]), bhDealloc, OBJC_ASSOCIATION_RETAIN);
         [self _prepClosure];
+        objc_setAssociatedObject(block, _replacementInvoke, bhDealloc, OBJC_ASSOCIATION_RETAIN);
     }
     return self;
 }
@@ -123,20 +134,42 @@ struct _BHBlock
     }
 }
 
+- (BHToken *)next
+{
+    if (!_next) {
+        BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, _originInvoke);
+        _next = bhDealloc.token;
+    }
+    return _next;
+}
+
 - (BOOL)remove
 {
+    if (self.isStackBlock) {
+        NSLog(@"Can't remove token for StackBlock!");
+        return NO;
+    }
     [self setBlockDeadCallback:nil];
     if (_originInvoke) {
-        if (self.isStackBlock) {
-            NSLog(@"Can't remove token for StackBlock!");
-            return NO;
-        }
         if (self.block) {
-            ((__bridge struct _BHBlock *)self.block)->invoke = _originInvoke;
+            BHToken *current = [self.block block_currentHookToken];
+            BHToken *last = nil;
+            while (current) {
+                if (current == self) {
+                    if (last) { // remove middle token
+                        last->_originInvoke = _originInvoke;
+                    }
+                    else { // remove head(current) token
+                        ((__bridge struct _BHBlock *)self.block)->invoke = _originInvoke;
+                    }
+                    break;
+                }
+                last = current;
+                current = [current next];
+            }
         }
-#if DEBUG
         _originInvoke = NULL;
-#endif
+        objc_setAssociatedObject(self.block, _replacementInvoke, nil, OBJC_ASSOCIATION_RETAIN);
         return YES;
     }
     return NO;
@@ -156,20 +189,22 @@ struct _BHBlock
         NSLog(@"Can't set BlockDeadCallback for StackBlock!");
         return;
     }
-    BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, NSSelectorFromString([NSString stringWithFormat:@"%p", self]));
+    BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, _replacementInvoke);
     bhDealloc.deadBlock = deadBlock;
 }
 
 - (NSString *)mangleName
 {
     if (!_mangleName) {
-        if (_originInvoke) {
-            Dl_info dlinfo;
-            memset(&dlinfo, 0, sizeof(dlinfo));
-            if (dladdr(_originInvoke, &dlinfo))
-            {
-                _mangleName = [NSString stringWithUTF8String:dlinfo.dli_sname];
-            }
+        Dl_info dlinfo;
+        memset(&dlinfo, 0, sizeof(dlinfo));
+        BHToken *firstToken = [self.block block_currentHookToken];
+        while ([firstToken next]) {
+            firstToken = [firstToken next];
+        }
+        if (firstToken && dladdr(firstToken->_originInvoke, &dlinfo))
+        {
+            _mangleName = [NSString stringWithUTF8String:dlinfo.dli_sname];
         }
     }
     return _mangleName;
@@ -483,12 +518,20 @@ static int BHTypeCount(const char *str)
 
 @implementation NSObject (BlockHook)
 
+- (BOOL)block_checkValid
+{
+    BOOL valid = [self isKindOfClass:NSClassFromString(@"NSBlock")];
+    if (!valid) {
+        NSLog(@"Not Block!");
+    }
+    return valid;
+}
+
 - (BHToken *)block_hookWithMode:(BlockHookMode)mode
                      usingBlock:(id)block
 {
     // __NSStackBlock__ -> __NSStackBlock -> NSBlock
-    if (!block || ![self isKindOfClass:NSClassFromString(@"NSBlock")]) {
-        NSLog(@"Not Block!");
+    if (!block || ![self block_checkValid]) {
         return nil;
     }
     struct _BHBlock *bh_block = (__bridge void *)self;
@@ -499,16 +542,28 @@ static int BHTypeCount(const char *str)
     BHToken *token = [[BHToken alloc] initWithBlock:self];
     token.mode = mode;
     token.hookBlock = block;
-    if ([self isKindOfClass:NSClassFromString(@"__NSStackBlock")]) {
-        NSLog(@"Stack Block! I suggest you copy it first!");
-        token.stackBlock = YES;
-    }
     return token;
 }
 
-- (BOOL)block_removeHook:(BHToken *)token
+- (void)block_removeAllHook
 {
-    return [token remove];
+    if (![self block_checkValid]) {
+        return;
+    }
+    BHToken *token = nil;
+    while ((token = [self block_currentHookToken])) {
+        [token remove];
+    }
+}
+
+- (BHToken *)block_currentHookToken
+{
+    if (![self block_checkValid]) {
+        return nil;
+    }
+    struct _BHBlock *bh_block = (__bridge void *)self;
+    BHDealloc *bhDealloc = objc_getAssociatedObject(self, bh_block->invoke);
+    return bhDealloc.token;
 }
 
 @end

@@ -121,6 +121,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 @property (nonatomic) SEL aliasSelector;
 @property (nonatomic, readwrite, getter=isActive) BOOL active;
+@property (nonatomic) NSHashTable *blockHookTokens;
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector;
 
 /**
@@ -140,6 +141,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
     if (self) {
         _target = target;
         _selector = selector;
+        _blockHookTokens = [NSHashTable weakObjectsHashTable];
     }
     return self;
 }
@@ -417,11 +419,14 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
     }
     
     [invocation retainArguments];
-    // TODO: ignore block already hooked; 
     for (NSNumber *index in tracker.blockArgIndex) {
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
             [invocation getArgument:&block atIndex:index.integerValue];
+            if ([tracker.blockHookTokens containsObject:block]) {
+                continue;
+            }
+            [tracker.blockHookTokens addObject:block];
             __weak typeof(block) weakBlock = block;
             __weak typeof(tracker) weakTracker = tracker;
             BHToken *tokenAfter = [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
@@ -719,7 +724,8 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
         return nil;
     }
     const char *originType = (char *)method_getTypeEncoding(originMethod);
-    if (![[NSString stringWithUTF8String:originType] containsString:@"@?"]) {
+    NSString *originTypeString = [NSString stringWithUTF8String:originType];
+    if ([originTypeString rangeOfString:@"@?"].location == NSNotFound) {
         return nil;
     }
     NSMutableArray *blockArgIndex = [NSMutableArray array];
@@ -727,7 +733,7 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
     while(originType && *originType)
     {
         originType = BTSizeAndAlignment(originType, NULL, NULL, NULL);
-        if ([[NSString stringWithUTF8String:originType] hasPrefix:@"@?"]) {
+        if ([originTypeString hasPrefix:@"@?"]) {
             [blockArgIndex addObject:@(argIndex)];
         }
         argIndex++;
