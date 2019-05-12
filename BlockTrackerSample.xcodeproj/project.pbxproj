@@ -21,6 +21,14 @@
 		A47059FA206E955900162FA7 /* BlockTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = A44BACF8206BD0D2007BE529 /* BlockTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A4D4AC7E22880E8D00FE04DB /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */; };
 		A4D4AC7F22881FF600FE04DB /* BlockTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACF9206BD0D2007BE529 /* BlockTracker.m */; };
+		A4D4AC882288274F00FE04DB /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A4D4AC872288274F00FE04DB /* AppDelegate.m */; };
+		A4D4AC8B2288274F00FE04DB /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A4D4AC8A2288274F00FE04DB /* ViewController.m */; };
+		A4D4AC8D2288275100FE04DB /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4D4AC8C2288275100FE04DB /* Assets.xcassets */; };
+		A4D4AC902288275100FE04DB /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4D4AC8E2288275100FE04DB /* Main.storyboard */; };
+		A4D4AC932288275100FE04DB /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A4D4AC922288275100FE04DB /* main.m */; };
+		A4D4AC982288280300FE04DB /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7522880E0800FE04DB /* BlockTracker.framework */; };
+		A4D4AC992288280300FE04DB /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7522880E0800FE04DB /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A4D4AC9D2288281D00FE04DB /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,6 +38,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = A47059EC206E94F200162FA7;
 			remoteInfo = "BlockTracker iOS";
+		};
+		A4D4AC9A2288280300FE04DB /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4D4AC7422880E0800FE04DB;
+			remoteInfo = "BlockTracker macOS";
 		};
 /* End PBXContainerItemProxy section */
 
@@ -41,6 +56,17 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A45040172285B5EC00DAFA1D /* BlockTracker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4D4AC9C2288280300FE04DB /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A4D4AC992288280300FE04DB /* BlockTracker.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -65,6 +91,16 @@
 		A47059ED206E94F200162FA7 /* BlockTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BlockTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4D4AC7522880E0800FE04DB /* BlockTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BlockTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BlockHook.framework; path = Carthage/Build/Mac/BlockHook.framework; sourceTree = "<group>"; };
+		A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockTrackerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4D4AC862288274F00FE04DB /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		A4D4AC872288274F00FE04DB /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		A4D4AC892288274F00FE04DB /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		A4D4AC8A2288274F00FE04DB /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		A4D4AC8C2288275100FE04DB /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A4D4AC8F2288275100FE04DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A4D4AC912288275100FE04DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A4D4AC922288275100FE04DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BlockTrackerSample_macOS.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,6 +129,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4D4AC812288274F00FE04DB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4D4AC982288280300FE04DB /* BlockTracker.framework in Frameworks */,
+				A4D4AC9D2288281D00FE04DB /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -100,7 +145,8 @@
 			isa = PBXGroup;
 			children = (
 				A44BACF7206BD0AA007BE529 /* BlockTracker */,
-				A44BACE0206BD07B007BE529 /* BlockTrackerSample */,
+				A44BACE0206BD07B007BE529 /* BlockTrackerSample iOS */,
+				A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */,
 				A44BACDF206BD07B007BE529 /* Products */,
 				A44BACFB206BD107007BE529 /* Frameworks */,
 			);
@@ -112,11 +158,12 @@
 				A44BACDE206BD07B007BE529 /* BlockTrackerSample.app */,
 				A47059ED206E94F200162FA7 /* BlockTracker.framework */,
 				A4D4AC7522880E0800FE04DB /* BlockTracker.framework */,
+				A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		A44BACE0206BD07B007BE529 /* BlockTrackerSample */ = {
+		A44BACE0206BD07B007BE529 /* BlockTrackerSample iOS */ = {
 			isa = PBXGroup;
 			children = (
 				A44BACE1206BD07B007BE529 /* AppDelegate.h */,
@@ -129,7 +176,7 @@
 				A44BACEF206BD07B007BE529 /* Info.plist */,
 				A44BACF0206BD07B007BE529 /* main.m */,
 			);
-			path = BlockTrackerSample;
+			path = "BlockTrackerSample iOS";
 			sourceTree = "<group>";
 		};
 		A44BACF7206BD0AA007BE529 /* BlockTracker */ = {
@@ -149,6 +196,22 @@
 				A41F8F562281BA3900EF6553 /* BlockHook.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */ = {
+			isa = PBXGroup;
+			children = (
+				A4D4AC862288274F00FE04DB /* AppDelegate.h */,
+				A4D4AC872288274F00FE04DB /* AppDelegate.m */,
+				A4D4AC892288274F00FE04DB /* ViewController.h */,
+				A4D4AC8A2288274F00FE04DB /* ViewController.m */,
+				A4D4AC8C2288275100FE04DB /* Assets.xcassets */,
+				A4D4AC8E2288275100FE04DB /* Main.storyboard */,
+				A4D4AC912288275100FE04DB /* Info.plist */,
+				A4D4AC922288275100FE04DB /* main.m */,
+				A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */,
+			);
+			path = "BlockTrackerSample macOS";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -228,6 +291,26 @@
 			productReference = A4D4AC7522880E0800FE04DB /* BlockTracker.framework */;
 			productType = "com.apple.product-type.framework";
 		};
+		A4D4AC832288274F00FE04DB /* BlockTrackerSample macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4D4AC952288275100FE04DB /* Build configuration list for PBXNativeTarget "BlockTrackerSample macOS" */;
+			buildPhases = (
+				A4D4AC802288274F00FE04DB /* Sources */,
+				A4D4AC812288274F00FE04DB /* Frameworks */,
+				A4D4AC822288274F00FE04DB /* Resources */,
+				A4D4AC9C2288280300FE04DB /* Embed Frameworks */,
+				A4D4AC9E2288282F00FE04DB /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4D4AC9B2288280300FE04DB /* PBXTargetDependency */,
+			);
+			name = "BlockTrackerSample macOS";
+			productName = "BlockTrackerSample macOS";
+			productReference = A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -249,6 +332,10 @@
 						CreatedOnToolsVersion = 10.2.1;
 						ProvisioningStyle = Automatic;
 					};
+					A4D4AC832288274F00FE04DB = {
+						CreatedOnToolsVersion = 10.2.1;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = A44BACD9206BD07B007BE529 /* Build configuration list for PBXProject "BlockTrackerSample" */;
@@ -265,6 +352,7 @@
 			projectRoot = "";
 			targets = (
 				A44BACDD206BD07B007BE529 /* BlockTrackerSample iOS */,
+				A4D4AC832288274F00FE04DB /* BlockTrackerSample macOS */,
 				A47059EC206E94F200162FA7 /* BlockTracker iOS */,
 				A4D4AC7422880E0800FE04DB /* BlockTracker macOS */,
 			);
@@ -296,6 +384,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4D4AC822288274F00FE04DB /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4D4AC8D2288275100FE04DB /* Assets.xcassets in Resources */,
+				A4D4AC902288275100FE04DB /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -313,6 +410,24 @@
 			);
 			outputPaths = (
 				"$(BUILT_PRODUCTS_DIR)/$(FRAMEWORKS_FOLDER_PATH)/BlockHook.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+		A4D4AC9E2288282F00FE04DB /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/Mac/BlockHook.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -347,6 +462,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4D4AC802288274F00FE04DB /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4D4AC8B2288274F00FE04DB /* ViewController.m in Sources */,
+				A4D4AC932288275100FE04DB /* main.m in Sources */,
+				A4D4AC882288274F00FE04DB /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -354,6 +479,11 @@
 			isa = PBXTargetDependency;
 			target = A47059EC206E94F200162FA7 /* BlockTracker iOS */;
 			targetProxy = A45040182285B5EC00DAFA1D /* PBXContainerItemProxy */;
+		};
+		A4D4AC9B2288280300FE04DB /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4D4AC7422880E0800FE04DB /* BlockTracker macOS */;
+			targetProxy = A4D4AC9A2288280300FE04DB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -372,6 +502,14 @@
 				A44BACED206BD07B007BE529 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		A4D4AC8E2288275100FE04DB /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A4D4AC8F2288275100FE04DB /* Base */,
+			);
+			name = Main.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -493,7 +631,7 @@
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
-				INFOPLIST_FILE = BlockTrackerSample/Info.plist;
+				INFOPLIST_FILE = "BlockTrackerSample iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
@@ -510,7 +648,7 @@
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
-				INFOPLIST_FILE = BlockTrackerSample/Info.plist;
+				INFOPLIST_FILE = "BlockTrackerSample iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
@@ -642,6 +780,55 @@
 			};
 			name = Release;
 		};
+		A4D4AC962288275100FE04DB /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = "BlockTrackerSample macOS/BlockTrackerSample_macOS.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = "BlockTrackerSample macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
+				PRODUCT_NAME = BlockTrackerSample;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A4D4AC972288275100FE04DB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_ENTITLEMENTS = "BlockTrackerSample macOS/BlockTrackerSample_macOS.entitlements";
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				INFOPLIST_FILE = "BlockTrackerSample macOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
+				PRODUCT_NAME = BlockTrackerSample;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -677,6 +864,15 @@
 			buildConfigurations = (
 				A4D4AC7A22880E0800FE04DB /* Debug */,
 				A4D4AC7B22880E0800FE04DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4D4AC952288275100FE04DB /* Build configuration list for PBXNativeTarget "BlockTrackerSample macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4D4AC962288275100FE04DB /* Debug */,
+				A4D4AC972288275100FE04DB /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
