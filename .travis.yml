@@ -10,6 +10,7 @@ env:
 before_install:
 - brew update
 - brew outdated carthage || brew upgrade carthage
+- pod install
 before_script:
 - carthage bootstrap
 before_deploy:
