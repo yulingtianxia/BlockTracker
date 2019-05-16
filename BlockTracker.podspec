@@ -22,6 +22,7 @@ s.osx.deployment_target = "10.8"
 s.requires_arc = true
 
 s.dependency 'BlockHook'
+s.dependency 'fishhook'
 
 end
 
