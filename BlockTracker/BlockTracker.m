@@ -11,8 +11,9 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread.h>
+#if TARGET_OS_IOS
 #import <fishhook/fishhook.h>
-
+#endif
 #if !__has_feature(objc_arc)
 #error
 #endif
