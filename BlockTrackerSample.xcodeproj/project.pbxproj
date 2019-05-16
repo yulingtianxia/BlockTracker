@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3E2E2EF218E98A949BA2B870 /* Pods_BlockTrackerSample_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E2968C57FCB6C1DE73D68F47 /* Pods_BlockTrackerSample_iOS.framework */; };
 		A44BACE3206BD07B007BE529 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACE2206BD07B007BE529 /* AppDelegate.m */; };
 		A44BACE6206BD07B007BE529 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACE5206BD07B007BE529 /* ViewController.m */; };
 		A44BACE9206BD07B007BE529 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A44BACE7206BD07B007BE529 /* Main.storyboard */; };
@@ -29,6 +30,7 @@
 		A4D4AC982288280300FE04DB /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7522880E0800FE04DB /* BlockTracker.framework */; };
 		A4D4AC992288280300FE04DB /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7522880E0800FE04DB /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A4D4AC9D2288281D00FE04DB /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */; };
+		FB0FD675E4A730F7F9AAF15D /* Pods_BlockTracker_iOS.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BD2D4CA1F6C5A426C359F502 /* Pods_BlockTracker_iOS.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +76,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0AF280CD18F7AC42DF703B2B /* Pods-BlockTracker iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockTracker iOS.release.xcconfig"; path = "Target Support Files/Pods-BlockTracker iOS/Pods-BlockTracker iOS.release.xcconfig"; sourceTree = "<group>"; };
+		200A1479594AED3642B0823F /* Pods_BlockTracker_macOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BlockTracker_macOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		3DB4BD65426C0A004C191432 /* Pods-BlockTracker iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockTracker iOS.debug.xcconfig"; path = "Target Support Files/Pods-BlockTracker iOS/Pods-BlockTracker iOS.debug.xcconfig"; sourceTree = "<group>"; };
+		618F78F0200D579F618D8CBC /* Pods-BlockTrackerSample iOS.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockTrackerSample iOS.debug.xcconfig"; path = "Target Support Files/Pods-BlockTrackerSample iOS/Pods-BlockTrackerSample iOS.debug.xcconfig"; sourceTree = "<group>"; };
 		A41F8F542281B86B00EF6553 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A41F8F562281BA3900EF6553 /* BlockHook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BlockHook.framework; path = Carthage/Build/iOS/BlockHook.framework; sourceTree = "<group>"; };
 		A44BACDE206BD07B007BE529 /* BlockTrackerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockTrackerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -101,6 +107,9 @@
 		A4D4AC912288275100FE04DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4D4AC922288275100FE04DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BlockTrackerSample_macOS.entitlements; sourceTree = "<group>"; };
+		A55D2119BE2390FAB1635743 /* Pods-BlockTrackerSample iOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BlockTrackerSample iOS.release.xcconfig"; path = "Target Support Files/Pods-BlockTrackerSample iOS/Pods-BlockTrackerSample iOS.release.xcconfig"; sourceTree = "<group>"; };
+		BD2D4CA1F6C5A426C359F502 /* Pods_BlockTracker_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BlockTracker_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		E2968C57FCB6C1DE73D68F47 /* Pods_BlockTrackerSample_iOS.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_BlockTrackerSample_iOS.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +119,7 @@
 			files = (
 				A45040162285B5EC00DAFA1D /* BlockTracker.framework in Frameworks */,
 				A45040382285B6B000DAFA1D /* BlockHook.framework in Frameworks */,
+				3E2E2EF218E98A949BA2B870 /* Pods_BlockTrackerSample_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -118,6 +128,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A45040122285B47400DAFA1D /* BlockHook.framework in Frameworks */,
+				FB0FD675E4A730F7F9AAF15D /* Pods_BlockTracker_iOS.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,6 +160,7 @@
 				A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */,
 				A44BACDF206BD07B007BE529 /* Products */,
 				A44BACFB206BD107007BE529 /* Frameworks */,
+				C8F35DC4A6BA2D393F53D35B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -194,6 +206,9 @@
 			children = (
 				A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */,
 				A41F8F562281BA3900EF6553 /* BlockHook.framework */,
+				BD2D4CA1F6C5A426C359F502 /* Pods_BlockTracker_iOS.framework */,
+				200A1479594AED3642B0823F /* Pods_BlockTracker_macOS.framework */,
+				E2968C57FCB6C1DE73D68F47 /* Pods_BlockTrackerSample_iOS.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -212,6 +227,17 @@
 				A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */,
 			);
 			path = "BlockTrackerSample macOS";
+			sourceTree = "<group>";
+		};
+		C8F35DC4A6BA2D393F53D35B /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3DB4BD65426C0A004C191432 /* Pods-BlockTracker iOS.debug.xcconfig */,
+				0AF280CD18F7AC42DF703B2B /* Pods-BlockTracker iOS.release.xcconfig */,
+				618F78F0200D579F618D8CBC /* Pods-BlockTrackerSample iOS.debug.xcconfig */,
+				A55D2119BE2390FAB1635743 /* Pods-BlockTrackerSample iOS.release.xcconfig */,
+			);
+			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,11 +265,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A44BACF4206BD07B007BE529 /* Build configuration list for PBXNativeTarget "BlockTrackerSample iOS" */;
 			buildPhases = (
+				05DAACE469E5F40906A1AB96 /* [CP] Check Pods Manifest.lock */,
 				A44BACDA206BD07B007BE529 /* Sources */,
 				A44BACDB206BD07B007BE529 /* Frameworks */,
 				A44BACDC206BD07B007BE529 /* Resources */,
 				A45040132285B4C800DAFA1D /* ShellScript */,
 				A450401A2285B5EC00DAFA1D /* Embed Frameworks */,
+				687E56AB7514B5929F8F1548 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -259,6 +287,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = A47059F8206E94F200162FA7 /* Build configuration list for PBXNativeTarget "BlockTracker iOS" */;
 			buildPhases = (
+				71AF25C85A7E71934EB4E673 /* [CP] Check Pods Manifest.lock */,
 				A47059E8206E94F200162FA7 /* Sources */,
 				A47059E9206E94F200162FA7 /* Frameworks */,
 				A47059EA206E94F200162FA7 /* Headers */,
@@ -317,7 +346,7 @@
 		A44BACD6206BD07B007BE529 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0930;
+				LastUpgradeCheck = 1020;
 				ORGANIZATIONNAME = "杨萧玉";
 				TargetAttributes = {
 					A44BACDD206BD07B007BE529 = {
@@ -396,6 +425,72 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		05DAACE469E5F40906A1AB96 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlockTrackerSample iOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		687E56AB7514B5929F8F1548 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-BlockTrackerSample iOS/Pods-BlockTrackerSample iOS-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/fishhook/fishhook.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/fishhook.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-BlockTrackerSample iOS/Pods-BlockTrackerSample iOS-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		71AF25C85A7E71934EB4E673 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-BlockTracker iOS-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
 		A45040132285B4C800DAFA1D /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -625,12 +720,16 @@
 		};
 		A44BACF5206BD07B007BE529 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 618F78F0200D579F618D8CBC /* Pods-BlockTrackerSample iOS.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = "BlockTrackerSample iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -642,12 +741,16 @@
 		};
 		A44BACF6206BD07B007BE529 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = A55D2119BE2390FAB1635743 /* Pods-BlockTrackerSample iOS.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = "BlockTrackerSample iOS/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -659,6 +762,7 @@
 		};
 		A47059F6206E94F200162FA7 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 3DB4BD65426C0A004C191432 /* Pods-BlockTracker iOS.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
@@ -672,7 +776,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = BlockTracker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -688,6 +795,7 @@
 		};
 		A47059F7206E94F200162FA7 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0AF280CD18F7AC42DF703B2B /* Pods-BlockTracker iOS.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
@@ -701,7 +809,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				ENABLE_BITCODE = NO;
-				FRAMEWORK_SEARCH_PATHS = "$(PROJECT_DIR)/Carthage/Build/iOS";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+					"$(inherited)",
+				);
 				INFOPLIST_FILE = BlockTracker/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -719,7 +830,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -752,7 +863,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_IDENTITY = "";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;

@@ -7,10 +7,11 @@
 //
 
 #import "BlockTracker.h"
-@import BlockHook;
+#import <BlockHook/BlockHook.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread.h>
+#import <fishhook/fishhook.h>
 
 #if !__has_feature(objc_arc)
 #error
@@ -755,3 +756,30 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
 }
 
 @end
+
+static void *(*bt_orig_Block_copy)(const void *aBlock);
+static void(*bt_before_Block_invoke)(void);
+static void(*bt_after_Block_invoke)(void);
+static void(*bt_when_Block_dead)(void);
+void *bt_replaced_Block_copy(const void *aBlock)
+{
+    void *result = bt_orig_Block_copy(aBlock);
+    id block = (__bridge id)(result);
+    [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
+        bt_before_Block_invoke();
+    }];
+    [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
+        bt_after_Block_invoke();
+    }];
+    [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
+        bt_when_Block_dead();
+    }];
+    return result;
+}
+
+void trackAllBlocks(void *before, void *after, void *dead) {
+    bt_before_Block_invoke = before;
+    bt_after_Block_invoke = after;
+    bt_when_Block_dead = dead;
+    rebind_symbols((struct rebinding[1]){"_Block_copy", bt_replaced_Block_copy, (void *)&bt_orig_Block_copy}, 1);
+}

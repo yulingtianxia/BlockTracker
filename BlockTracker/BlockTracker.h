@@ -78,4 +78,8 @@ Class bt_metaClass(Class cls);
 
 @end
 
+void trackAllBlocks(void *before, void *after, void *dead);
+
 NS_ASSUME_NONNULL_END
+
+
