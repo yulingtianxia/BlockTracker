@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "A44BACDD206BD07B007BE529"
+               BlueprintIdentifier = "A4D4AC832288274F00FE04DB"
                BuildableName = "BlockTrackerSample.app"
-               BlueprintName = "BlockTrackerSample iOS"
+               BlueprintName = "BlockTrackerSample macOS"
                ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -32,9 +32,9 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A44BACDD206BD07B007BE529"
+            BlueprintIdentifier = "A4D4AC832288274F00FE04DB"
             BuildableName = "BlockTrackerSample.app"
-            BlueprintName = "BlockTrackerSample iOS"
+            BlueprintName = "BlockTrackerSample macOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
       </MacroExpansion>
@@ -55,24 +55,12 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A44BACDD206BD07B007BE529"
+            BlueprintIdentifier = "A4D4AC832288274F00FE04DB"
             BuildableName = "BlockTrackerSample.app"
-            BlueprintName = "BlockTrackerSample iOS"
+            BlueprintName = "BlockTrackerSample macOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
-      <EnvironmentVariables>
-         <EnvironmentVariable
-            key = "OBJC_PRINT_IMAGES"
-            value = "YES"
-            isEnabled = "NO">
-         </EnvironmentVariable>
-         <EnvironmentVariable
-            key = "DYLD_PRINT_BINDINGS"
-            value = "YES"
-            isEnabled = "NO">
-         </EnvironmentVariable>
-      </EnvironmentVariables>
       <AdditionalOptions>
       </AdditionalOptions>
    </LaunchAction>
@@ -86,9 +74,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "A44BACDD206BD07B007BE529"
+            BlueprintIdentifier = "A4D4AC832288274F00FE04DB"
             BuildableName = "BlockTrackerSample.app"
-            BlueprintName = "BlockTrackerSample iOS"
+            BlueprintName = "BlockTrackerSample macOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>

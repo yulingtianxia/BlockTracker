@@ -117,6 +117,24 @@ struct TestStruct _testRect;
     }];
 }
 
+- (void)testProtocol {
+    int(^block)(int x, int y) = ^int(int x, int y) {
+        int result = x + y;
+        NSLog(@"%d + %d = %d", x, y, result);
+        return result;
+    };
+    const char *(^protocolBlock)(id<CALayerDelegate>, int(^)(int, int)) = ^(id<CALayerDelegate> delegate, int(^block)(int, int)) {
+        return (const char *)"test protocol";
+    };
+    const char *fakeResult = "lalalala";
+    [protocolBlock block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation, id<CALayerDelegate> delegate, int(^block)(int x, int y)){
+        *(const char **)(invocation.retValue) = fakeResult;
+    }];
+    id z = [NSObject new];
+    const char *result = protocolBlock(z, block);
+    NSAssert(strcmp(result, fakeResult) == 0, @"Change const char * result failed!");
+}
+
 - (void)testHookBlock {
     
     NSObject *z = NSObject.new;

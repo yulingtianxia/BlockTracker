@@ -10,6 +10,7 @@
 #import <ffi.h>
 #import <objc/runtime.h>
 #import <dlfcn.h>
+#import <os/lock.h>
 
 #if !__has_feature(objc_arc)
 #error
@@ -57,10 +58,73 @@ struct _BHBlock
 
 @end
 
+@interface BHInvokeLock : NSObject
+
+@property (nonatomic) dispatch_semaphore_t semaphore;
+@property (nonatomic) os_unfair_lock unfair_lock OS_UNFAIR_LOCK_AVAILABILITY;
+- (void)lock;
+- (void)unlock;
+
+@end
+
+@implementation BHInvokeLock
+
+- (instancetype)init
+{
+    self = [super init];
+    if (self) {
+        if (@available(iOS 10.0, macOS 10.12, *)) {
+            _unfair_lock = OS_UNFAIR_LOCK_INIT;
+        } else {
+            _semaphore = dispatch_semaphore_create(1);
+        }
+    }
+    return self;
+}
+
+- (void)lock
+{
+    if (@available(iOS 10.0, macOS 10.12, *)) {
+        os_unfair_lock_lock(&_unfair_lock);
+    } else {
+        dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
+    }
+}
+
+- (void)unlock
+{
+    if (@available(iOS 10.0, macOS 10.12, *)) {
+        os_unfair_lock_unlock(&_unfair_lock);
+    } else {
+        dispatch_semaphore_signal(self.semaphore);
+    }
+}
+
+@end
+
+@interface NSObject (BHInvokeLock)
+
+- (BHInvokeLock *)invokeLock;
+
+@end
+
+@implementation NSObject (BHInvokeLock)
+
+- (BHInvokeLock *)invokeLock
+{
+    BHInvokeLock *lock = objc_getAssociatedObject(self, _cmd);
+    if (!lock) {
+        lock = [BHInvokeLock new];
+        objc_setAssociatedObject(self, _cmd, lock, OBJC_ASSOCIATION_RETAIN);
+    }
+    return lock;
+}
+
+@end
+
 @interface BHToken ()
 {
     ffi_cif _cif;
-    void *_originInvoke;
     void *_replacementInvoke;
     ffi_closure *_closure;
 }
@@ -71,6 +135,7 @@ struct _BHBlock
 @property (nonatomic) id hookBlock;
 @property (nonatomic, nullable, readwrite) NSString *mangleName;
 @property (nonatomic) NSMethodSignature *originalBlockSignature;
+@property (atomic) void *originInvoke;
 
 /**
  if block is kind of `__NSStackBlock__` class.
@@ -79,7 +144,6 @@ struct _BHBlock
 @property (nonatomic, getter=hasStret) BOOL stret;
 @property (nonatomic, nullable, readwrite) BHToken *next;
 
-- (id)initWithBlock:(id)block;
 - (void)invokeOriginalBlockWithArgs:(void **)args retValue:(void *)retValue;
 
 @end
@@ -102,16 +166,19 @@ struct _BHBlock
 
 @implementation BHToken
 
-- (instancetype)initWithBlock:(id)block
+- (instancetype)initWithBlock:(id)block mode:(BlockHookMode)mode hookBlock:(id)hookBlock
 {
     self = [super init];
     if (self) {
         _allocations = [[NSMutableArray alloc] init];
         _block = block;
-        _originalBlockSignature = [NSMethodSignature signatureWithObjCTypes:BHBlockTypeEncodeString(block)];
+        const char *encode = BHBlockTypeEncodeString(block);
+        _numberOfArguments = [self _prepCIF:&_cif withEncodeString:encode];
+        if (_numberOfArguments == -1) { // Unknown encode.
+            return nil;
+        }
+        _originalBlockSignature = [NSMethodSignature signatureWithObjCTypes:encode];
         _closure = ffi_closure_alloc(sizeof(ffi_closure), &_replacementInvoke);
-        _numberOfArguments = [self _prepCIF:&_cif withEncodeString:BHBlockTypeEncodeString(_block)];
-        
         if ([block isKindOfClass:NSClassFromString(@"__NSStackBlock")]) {
             NSLog(@"Hooking StackBlock causes a memory leak! I suggest you copy it first!");
             self.stackBlock = YES;
@@ -121,6 +188,8 @@ struct _BHBlock
         bhDealloc.token = self;
         [self _prepClosure];
         objc_setAssociatedObject(block, _replacementInvoke, bhDealloc, OBJC_ASSOCIATION_RETAIN);
+        self.mode = mode;
+        self.hookBlock = hookBlock;
     }
     return self;
 }
@@ -137,7 +206,7 @@ struct _BHBlock
 - (BHToken *)next
 {
     if (!_next) {
-        BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, _originInvoke);
+        BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, self.originInvoke);
         _next = bhDealloc.token;
     }
     return _next;
@@ -149,18 +218,23 @@ struct _BHBlock
         NSLog(@"Can't remove token for StackBlock!");
         return NO;
     }
+    
     [self setBlockDeadCallback:nil];
-    if (_originInvoke) {
+    if (self.originInvoke) {
         if (self.block) {
             BHToken *current = [self.block block_currentHookToken];
             BHToken *last = nil;
             while (current) {
                 if (current == self) {
                     if (last) { // remove middle token
-                        last->_originInvoke = _originInvoke;
+                        last.originInvoke = self.originInvoke;
+                        last.next = nil;
                     }
                     else { // remove head(current) token
-                        ((__bridge struct _BHBlock *)self.block)->invoke = _originInvoke;
+                        BHInvokeLock *lock = [self.block invokeLock];
+                        [lock lock];
+                        ((__bridge struct _BHBlock *)self.block)->invoke = self.originInvoke;
+                        [lock unlock];
                     }
                     break;
                 }
@@ -168,7 +242,7 @@ struct _BHBlock
                 current = [current next];
             }
         }
-        _originInvoke = NULL;
+        self.originInvoke = NULL;
         objc_setAssociatedObject(self.block, _replacementInvoke, nil, OBJC_ASSOCIATION_RETAIN);
         return YES;
     }
@@ -202,7 +276,7 @@ struct _BHBlock
         while ([firstToken next]) {
             firstToken = [firstToken next];
         }
-        if (firstToken && dladdr(firstToken->_originInvoke, &dlinfo))
+        if (firstToken && dladdr(firstToken.originInvoke, &dlinfo))
         {
             _mangleName = [NSString stringWithUTF8String:dlinfo.dli_sname];
         }
@@ -212,8 +286,8 @@ struct _BHBlock
 
 - (void)invokeOriginalBlockWithArgs:(void **)args retValue:(void *)retValue
 {
-    if (_originInvoke) {
-        ffi_call(&_cif, _originInvoke, retValue, args);
+    if (self.originInvoke) {
+        ffi_call(&_cif, self.originInvoke, retValue, args);
     }
     else {
         NSLog(@"You had lost your originInvoke! Please check the order of removing tokens!");
@@ -311,6 +385,9 @@ static int BHTypeCount(const char *str)
         temp++;
     }
     ffi_type **elements = [self _typesWithEncodeString:temp + 1];
+    if (!elements) {
+        return nil;
+    }
     structType->elements = elements;
     
     return structType;
@@ -386,13 +463,27 @@ static int BHTypeCount(const char *str)
     COND(double, double);
     
     COND(void, void);
+    
+    // Ignore Method Encodings
+    switch (*str) {
+        case 'r':
+        case 'R':
+        case 'n':
+        case 'N':
+        case 'o':
+        case 'O':
+        case 'V':
+            return [self _ffiTypeForEncode:str + 1];
+    }
+    
+    // Struct Type Encodings
     if (*str == '{') {
         ffi_type *structType = [self _ffiTypeForStructEncode:str];
         return structType;
     }
     
     NSLog(@"Unknown encode string %s", str);
-    abort();
+    return nil;
 }
 
 - (ffi_type **)_argsWithEncodeString:(const char *)str getCount:(int *)outCount
@@ -416,7 +507,16 @@ static int BHTypeCount(const char *str)
     {
         const char *next = BHSizeAndAlignment(str, NULL, NULL, NULL);
         if (i >= 0 && i < argCount) {
-            argTypes[i] = [self _ffiTypeForEncode:str];
+            ffi_type *argType = [self _ffiTypeForEncode:str];
+            if (argType) {
+                argTypes[i] = argType;
+            }
+            else {
+                if (outCount) {
+                    *outCount = -1;
+                }
+                return nil;
+            }
         }
         i++;
         str = next;
@@ -437,6 +537,9 @@ static int BHTypeCount(const char *str)
     struct _BHBlock *bh_block = (__bridge void *)self.block;
     if ((bh_block->flags & BLOCK_HAS_STRET)) {
         argTypes = [self _typesWithEncodeString:str getCount:&argCount startIndex:0];
+        if (!argTypes) { // Error!
+            return -1;
+        }
         argTypes[0] = &ffi_type_pointer;
         returnType = &ffi_type_void;
         self.stret = YES;
@@ -444,7 +547,13 @@ static int BHTypeCount(const char *str)
     }
     else {
         argTypes = [self _argsWithEncodeString:str getCount:&argCount];
+        if (!argTypes) { // Error!
+            return -1;
+        }
         returnType = [self _ffiTypeForEncode:str];
+    }
+    if (!returnType) { // Error!
+        return -1;
     }
     ffi_status status = ffi_prep_cif(cif, FFI_DEFAULT_ABI, argCount, returnType, argTypes);
     if (status != FFI_OK) {
@@ -462,8 +571,11 @@ static int BHTypeCount(const char *str)
         abort();
     }
     // exchange invoke func imp
-    _originInvoke = ((__bridge struct _BHBlock *)self.block)->invoke;
+    BHInvokeLock *lock = [self.block invokeLock];
+    [lock lock];
+    self.originInvoke = ((__bridge struct _BHBlock *)self.block)->invoke;
     ((__bridge struct _BHBlock *)self.block)->invoke = _replacementInvoke;
+    [lock unlock];
 }
 
 - (BOOL)invokeHookBlockWithArgs:(void **)args retValue:(void *)retValue
@@ -539,9 +651,7 @@ static int BHTypeCount(const char *str)
         NSLog(@"Block has no signature! Required ABI.2010.3.16");
         return nil;
     }
-    BHToken *token = [[BHToken alloc] initWithBlock:self];
-    token.mode = mode;
-    token.hookBlock = block;
+    BHToken *token = [[BHToken alloc] initWithBlock:self mode:mode hookBlock:block];
     return token;
 }
 
@@ -561,9 +671,19 @@ static int BHTypeCount(const char *str)
     if (![self block_checkValid]) {
         return nil;
     }
-    struct _BHBlock *bh_block = (__bridge void *)self;
-    BHDealloc *bhDealloc = objc_getAssociatedObject(self, bh_block->invoke);
+    void *invoke = [self block_currentInvokeFunction];
+    BHDealloc *bhDealloc = objc_getAssociatedObject(self, invoke);
     return bhDealloc.token;
+}
+
+- (void *)block_currentInvokeFunction
+{
+    struct _BHBlock *bh_block = (__bridge void *)self;
+    BHInvokeLock *lock = [self invokeLock];
+    [lock lock];
+    void *invoke = bh_block->invoke;
+    [lock unlock];
+    return invoke;
 }
 
 @end

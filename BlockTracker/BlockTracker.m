@@ -11,9 +11,8 @@
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread.h>
-#if TARGET_OS_IOS
-#import <fishhook/fishhook.h>
-#endif
+#import <mach-o/getsect.h>
+#import "fishhook.h"
 #if !__has_feature(objc_arc)
 #error
 #endif
@@ -735,7 +734,7 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
     while(originType && *originType)
     {
         originType = BTSizeAndAlignment(originType, NULL, NULL, NULL);
-        if ([originTypeString hasPrefix:@"@?"]) {
+        if ([[NSString stringWithUTF8String:originType] hasPrefix:@"@?"]) {
             [blockArgIndex addObject:@(argIndex)];
         }
         argIndex++;
@@ -758,23 +757,37 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
 
 @end
 
+extern const struct mach_header* _NSGetMachExecuteHeader(void);
+unsigned long imageTextStart = 0;
+unsigned long imageTextEnd = 0;
+
 static void *(*bt_orig_Block_copy)(const void *aBlock);
-static void(*bt_before_Block_invoke)(void);
-static void(*bt_after_Block_invoke)(void);
-static void(*bt_when_Block_dead)(void);
+static void(*bt_before_Block_invoke)(id);
+static void(*bt_after_Block_invoke)(id);
+static void(*bt_when_Block_dead)(id);
+
+void(^hookBefore)(BHInvocation *) = ^(BHInvocation *invocation) {
+    bt_before_Block_invoke(invocation.token.block);
+};
+
+void(^hookAfter)(BHInvocation *) = ^(BHInvocation *invocation) {
+    bt_after_Block_invoke(invocation.token.block);
+};
+
+void(^hookDead)(BHToken *) = ^(BHToken *token) {
+    bt_when_Block_dead(token.block);
+};
+
 void *bt_replaced_Block_copy(const void *aBlock)
 {
     void *result = bt_orig_Block_copy(aBlock);
-    id block = (__bridge id)(result);
-    [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
-        bt_before_Block_invoke();
-    }];
-    [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
-        bt_after_Block_invoke();
-    }];
-    [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
-        bt_when_Block_dead();
-    }];
+    if (aBlock == result) {
+        return result;
+    }
+    NSLog(@"Will Hook Block: %@", result);
+    [(__bridge id)(result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
+    [(__bridge id)(result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
+    [(__bridge id)(result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
     return result;
 }
 
