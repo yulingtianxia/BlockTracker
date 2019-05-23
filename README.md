@@ -1,6 +1,6 @@
 <p align="center">
-<a href="https://github.com/yulingtianxia/BlockHook">
-<img src="Assets/logo.png" alt="BlockHook" />
+<a href="https://github.com/yulingtianxia/BlockTracker">
+<img src="Assets/logo.png" alt="BlockTracker" />
 </a>
 </p>
 

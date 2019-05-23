@@ -804,7 +804,6 @@ void *bt_replaced_Block_copy(const void *aBlock)
     if (aBlock == result) {
         return result;
     }
-    NSLog(@"Will Hook Block: %@", result);
     [(__bridge id)(result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
     [(__bridge id)(result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
     [(__bridge id)(result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
