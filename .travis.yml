@@ -16,7 +16,7 @@ before_script:
 before_deploy:
 - carthage build --no-skip-current
 - carthage archive $FRAMEWORK_NAME
-script: xcodebuild -workspace BlockTrackerSample.xcworkspace -scheme
+script: xcodebuild -project BlockTrackerSample.xcodeproj -scheme
   "BlockTracker iOS" -configuration Release
 deploy:
   provider: releases
