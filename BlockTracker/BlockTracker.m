@@ -772,32 +772,30 @@ unsigned long imageTextStart = 0;
 unsigned long imageTextEnd = 0;
 
 static void *(*bt_orig_Block_copy)(const void *aBlock);
-static BlockTrackerCallbackFP bt_before_Block_invoke;
-static BlockTrackerCallbackFP bt_after_Block_invoke;
-static BlockTrackerCallbackFP bt_when_Block_dead;
+static BlockTrackerCallback bt_blockTrackerCallback;
 
 void(^hookBefore)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_before_Block_invoke(invocation.token.block,
-                           BlockTrackerCallbackTypeBefore,
-                           invocation.args,
-                           nil,
-                           invocation.token.mangleName);
+    bt_blockTrackerCallback(invocation.token.block,
+                            BlockTrackerCallbackTypeBefore,
+                            invocation.args,
+                            nil,
+                            invocation.token.mangleName);
 };
 
 void(^hookAfter)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_after_Block_invoke(invocation.token.block,
-                          BlockTrackerCallbackTypeAfter,
-                          invocation.args,
-                          invocation.retValue,
-                          invocation.token.mangleName);
+    bt_blockTrackerCallback(invocation.token.block,
+                            BlockTrackerCallbackTypeAfter,
+                            invocation.args,
+                            invocation.retValue,
+                            invocation.token.mangleName);
 };
 
 void(^hookDead)(BHToken *) = ^(BHToken *token) {
-    bt_when_Block_dead(nil,
-                       BlockTrackerCallbackTypeDead,
-                       nil,
-                       nil,
-                       invocation.token.mangleName);
+    bt_blockTrackerCallback(nil,
+                            BlockTrackerCallbackTypeDead,
+                            nil,
+                            nil,
+                            token.mangleName);
 };
 
 void *bt_replaced_Block_copy(const void *aBlock)
@@ -813,9 +811,7 @@ void *bt_replaced_Block_copy(const void *aBlock)
     return result;
 }
 
-void trackAllBlocks(BlockTrackerCallbackFP before, BlockTrackerCallbackFP after, BlockTrackerCallbackFP dead) {
-    bt_before_Block_invoke = before;
-    bt_after_Block_invoke = after;
-    bt_when_Block_dead = dead;
+void trackAllBlocks(BlockTrackerCallback callback) {
+    bt_blockTrackerCallback = callback;
     rebind_symbols((struct rebinding[1]){"_Block_copy", bt_replaced_Block_copy, (void *)&bt_orig_Block_copy}, 1);
 }

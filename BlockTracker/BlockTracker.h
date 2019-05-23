@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
  @param args InvokeType 下为这次执行传入 block 的参数；DeadType 下为空
  @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
  */
-typedef void(^BlockTrackerCallback)(id _Nullable block, BlockTrackerCallbackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSString *mangleName);
+typedef void(^BlockTrackerCallback)(id _Nullable block, BlockTrackerCallbackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSString *_Nullable mangleName);
 
 /**
  获取元类
@@ -77,9 +77,9 @@ Class bt_metaClass(Class cls);
 
 @end
 
-typedef void (*BlockTrackerCallbackFP)(id, BlockTrackerCallbackType, void *_Nullable *_Null_unspecified, void *_Nullable, NSString *);
+typedef void (*BlockTrackerCallbackFP)(id _Nullable, BlockTrackerCallbackType, void *_Nullable *_Null_unspecified, void *_Nullable, NSString *_Nullable);
 
-void trackAllBlocks(BlockTrackerCallbackFP before, BlockTrackerCallbackFP after, BlockTrackerCallbackFP dead);
+void trackAllBlocks(BlockTrackerCallback callback);
 
 NS_ASSUME_NONNULL_END
 
