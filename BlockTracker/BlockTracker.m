@@ -118,7 +118,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
 
 @interface BTTracker ()
 
-@property (nonatomic) BlockTrackerCallbackBlock callback;
+@property (nonatomic) BlockTrackerCallback callback;
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 @property (nonatomic) SEL aliasSelector;
 @property (nonatomic, readwrite, getter=isActive) BOOL active;
@@ -428,29 +428,39 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
                 continue;
             }
             [tracker.blockHookTokens addObject:block];
-            __weak typeof(block) weakBlock = block;
+            
             __weak typeof(tracker) weakTracker = tracker;
-            BHToken *tokenAfter = [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
-                __strong typeof(weakBlock) strongBlock = weakBlock;
+            
+            [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
                 __strong typeof(weakTracker) strongTracker = weakTracker;
-                NSNumber *invokeCount = objc_getAssociatedObject(invocation.token, NSSelectorFromString(@"invokeCount"));
-                if (!invokeCount) {
-                    invokeCount = @(1);
-                }
-                else {
-                    invokeCount = [NSNumber numberWithInt:invokeCount.intValue + 1];
-                }
-                objc_setAssociatedObject(invocation.token, NSSelectorFromString(@"invokeCount"), invokeCount, OBJC_ASSOCIATION_RETAIN);
                 if (strongTracker.callback) {
-                    strongTracker.callback(strongBlock, BlockTrackerCallbackTypeInvoke, invokeCount.intValue, invocation.args, invocation.retValue, [NSThread callStackSymbols], invocation.token.mangleName);
+                    strongTracker.callback(invocation.token.block,
+                                           BlockTrackerCallbackTypeBefore,
+                                           invocation.args,
+                                           nil,
+                                           invocation.token.mangleName);
+                }
+            }];
+            
+            [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
+                __strong typeof(weakTracker) strongTracker = weakTracker;
+                if (strongTracker.callback) {
+                    strongTracker.callback(invocation.token.block,
+                                           BlockTrackerCallbackTypeAfter,
+                                           invocation.args,
+                                           invocation.retValue,
+                                           invocation.token.mangleName);
                 }
             }];
 
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
                 __strong typeof(weakTracker) strongTracker = weakTracker;
-                NSNumber *invokeCount = objc_getAssociatedObject(tokenAfter, NSSelectorFromString(@"invokeCount"));
                 if (strongTracker.callback) {
-                    strongTracker.callback(nil, BlockTrackerCallbackTypeDead, invokeCount.intValue, nil, nil, [NSThread callStackSymbols], token.mangleName);
+                    strongTracker.callback(nil,
+                                           BlockTrackerCallbackTypeDead,
+                                           nil,
+                                           nil,
+                                           token.mangleName);
                 }
             }];
         }
@@ -718,7 +728,7 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
     return [result copy];
 }
 
-- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallback)callback
 {
     Method originMethod = class_getInstanceMethod([self class], selector);
     if (!originMethod) {
@@ -762,20 +772,32 @@ unsigned long imageTextStart = 0;
 unsigned long imageTextEnd = 0;
 
 static void *(*bt_orig_Block_copy)(const void *aBlock);
-static void(*bt_before_Block_invoke)(id);
-static void(*bt_after_Block_invoke)(id);
-static void(*bt_when_Block_dead)(id);
+static BlockTrackerCallbackFP bt_before_Block_invoke;
+static BlockTrackerCallbackFP bt_after_Block_invoke;
+static BlockTrackerCallbackFP bt_when_Block_dead;
 
 void(^hookBefore)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_before_Block_invoke(invocation.token.block);
+    bt_before_Block_invoke(invocation.token.block,
+                           BlockTrackerCallbackTypeBefore,
+                           invocation.args,
+                           nil,
+                           invocation.token.mangleName);
 };
 
 void(^hookAfter)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_after_Block_invoke(invocation.token.block);
+    bt_after_Block_invoke(invocation.token.block,
+                          BlockTrackerCallbackTypeAfter,
+                          invocation.args,
+                          invocation.retValue,
+                          invocation.token.mangleName);
 };
 
 void(^hookDead)(BHToken *) = ^(BHToken *token) {
-    bt_when_Block_dead(token.block);
+    bt_when_Block_dead(nil,
+                       BlockTrackerCallbackTypeDead,
+                       nil,
+                       nil,
+                       invocation.token.mangleName);
 };
 
 void *bt_replaced_Block_copy(const void *aBlock)
@@ -791,7 +813,7 @@ void *bt_replaced_Block_copy(const void *aBlock)
     return result;
 }
 
-void trackAllBlocks(void *before, void *after, void *dead) {
+void trackAllBlocks(BlockTrackerCallbackFP before, BlockTrackerCallbackFP after, BlockTrackerCallbackFP dead) {
     bt_before_Block_invoke = before;
     bt_after_Block_invoke = after;
     bt_when_Block_dead = dead;

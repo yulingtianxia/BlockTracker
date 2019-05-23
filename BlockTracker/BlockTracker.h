@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 
 typedef NS_ENUM(NSUInteger, BlockTrackerCallbackType) {
-    BlockTrackerCallbackTypeInvoke,
+    BlockTrackerCallbackTypeBefore,
+    BlockTrackerCallbackTypeAfter,
     BlockTrackerCallbackTypeDead,
 };
 
@@ -20,12 +21,10 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param block 被追踪的 block
  @param type  追踪到的类型：Invoke 或 Dead
- @param invokeCount block 参数被执行过的次数
  @param args InvokeType 下为这次执行传入 block 的参数；DeadType 下为空
  @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
- @param callStackSymbols 堆栈信息
  */
-typedef void(^BlockTrackerCallbackBlock)(id _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSArray<NSString *> *callStackSymbols, NSString *mangleName);
+typedef void(^BlockTrackerCallback)(id _Nullable block, BlockTrackerCallbackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSString *mangleName);
 
 /**
  获取元类
@@ -74,11 +73,13 @@ Class bt_metaClass(Class cls);
  @param selector 追踪 block 参数所属的方法
  @return 如果追踪成功则返回追踪者对象，否则返回 nil
  */
-- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallbackBlock)callback;
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallback)callback;
 
 @end
 
-void trackAllBlocks(void *before, void *after, void *dead);
+typedef void (*BlockTrackerCallbackFP)(id, BlockTrackerCallbackType, void *_Nullable *_Null_unspecified, void *_Nullable, NSString *);
+
+void trackAllBlocks(BlockTrackerCallbackFP before, BlockTrackerCallbackFP after, BlockTrackerCallbackFP dead);
 
 NS_ASSUME_NONNULL_END
 
