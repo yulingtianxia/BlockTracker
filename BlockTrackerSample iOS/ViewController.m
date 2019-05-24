@@ -39,9 +39,9 @@
     [self performBlock:^{
         NSLog(@"%@", word);
     }];
-//    trackAllBlocks(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
-//        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
-//    });
+    trackAllBlocks(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
+        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
+    });
     // stop tracker in future
 //    [tracker stop];
     // blocks will die

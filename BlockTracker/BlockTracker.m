@@ -459,6 +459,8 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
                                      token.mangleName);
                 }
             }];
+            
+            NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
         }
     }
     invocation.selector = tracker.aliasSelector;
@@ -803,6 +805,8 @@ void *bt_replaced_Block_copy(const void *aBlock)
     [(__bridge id)(result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
     [(__bridge id)(result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
     [(__bridge id)(result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
+    
+    NSLog(@"Hook Block Arg mangleName:%@", [(__bridge id)(result) block_currentHookToken].mangleName);
     return result;
 }
 
