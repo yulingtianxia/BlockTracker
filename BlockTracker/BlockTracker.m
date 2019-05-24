@@ -427,40 +427,36 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
             if ([tracker.blockHookTokens containsObject:block]) {
                 continue;
             }
+            // It's a weak reference.
             [tracker.blockHookTokens addObject:block];
             
-            __weak typeof(tracker) weakTracker = tracker;
-            
             [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
-                __strong typeof(weakTracker) strongTracker = weakTracker;
-                if (strongTracker.callback) {
-                    strongTracker.callback(invocation.token.block,
-                                           BlockTrackerCallbackTypeBefore,
-                                           invocation.args,
-                                           nil,
-                                           invocation.token.mangleName);
+                if (tracker.callback) {
+                    tracker.callback(invocation.token.block,
+                                     BlockTrackerCallbackTypeBefore,
+                                     invocation.args,
+                                     nil,
+                                     invocation.token.mangleName);
                 }
             }];
             
             [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
-                __strong typeof(weakTracker) strongTracker = weakTracker;
-                if (strongTracker.callback) {
-                    strongTracker.callback(invocation.token.block,
-                                           BlockTrackerCallbackTypeAfter,
-                                           invocation.args,
-                                           invocation.retValue,
-                                           invocation.token.mangleName);
+                if (tracker.callback) {
+                    tracker.callback(invocation.token.block,
+                                     BlockTrackerCallbackTypeAfter,
+                                     invocation.args,
+                                     invocation.retValue,
+                                     invocation.token.mangleName);
                 }
             }];
 
             [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
-                __strong typeof(weakTracker) strongTracker = weakTracker;
-                if (strongTracker.callback) {
-                    strongTracker.callback(nil,
-                                           BlockTrackerCallbackTypeDead,
-                                           nil,
-                                           nil,
-                                           token.mangleName);
+                if (tracker.callback) {
+                    tracker.callback(nil,
+                                     BlockTrackerCallbackTypeDead,
+                                     nil,
+                                     nil,
+                                     token.mangleName);
                 }
             }];
         }
