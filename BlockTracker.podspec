@@ -12,7 +12,7 @@ s.author       = { "yulingtianxia" => "yulingtianxia@gmail.com" }
 s.social_media_url = 'https://twitter.com/yulingtianxia'
 s.source       = { :git => "https://github.com/yulingtianxia/BlockTracker.git", :tag => s.version.to_s }
 
-s.source_files = "BlockTracker/*.{h,m}"
+s.source_files = "BlockTracker/*.{h,m,c}"
 s.public_header_files = "BlockTracker/*.h"
 
 s.ios.deployment_target = "8.0"
