@@ -765,10 +765,6 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
 
 @end
 
-extern const struct mach_header* _NSGetMachExecuteHeader(void);
-unsigned long imageTextStart = 0;
-unsigned long imageTextEnd = 0;
-
 static void *(*bt_orig_Block_copy)(const void *aBlock);
 static BlockTrackerCallback bt_blockTrackerCallback;
 
@@ -802,15 +798,19 @@ void *bt_replaced_Block_copy(const void *aBlock)
     if (aBlock == result) {
         return result;
     }
-    [(__bridge id)(result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
-    [(__bridge id)(result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
-    [(__bridge id)(result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
     
-    NSLog(@"Hook Block Arg mangleName:%@", [(__bridge id)(result) block_currentHookToken].mangleName);
+    [((__bridge id)result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
+    [((__bridge id)result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
+    [((__bridge id)result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
+    
+    NSLog(@"Hook Block mangleName:%@", [(__bridge id)(result) block_currentHookToken].mangleName);
     return result;
 }
 
-void trackAllBlocks(BlockTrackerCallback callback) {
+void setMallocBlockCallback(BlockTrackerCallback callback) {
     bt_blockTrackerCallback = callback;
-    rebind_symbols((struct rebinding[1]){"_Block_copy", bt_replaced_Block_copy, (void *)&bt_orig_Block_copy}, 1);
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        rebind_symbols((struct rebinding[1]){"_Block_copy", bt_replaced_Block_copy, (void *)&bt_orig_Block_copy}, 1);
+    });
 }

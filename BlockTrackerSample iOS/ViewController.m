@@ -39,7 +39,14 @@
     [self performBlock:^{
         NSLog(@"%@", word);
     }];
-    trackAllBlocks(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
+    
+//    void(^globalBlock)(void) = ^() {
+//        NSLog(@"Global block!");
+//    };
+    
+//    [self performBlock:globalBlock];
+    
+    setMallocBlockCallback(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
         NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
     });
     // stop tracker in future

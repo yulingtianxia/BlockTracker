@@ -21,12 +21,11 @@ BlockTracker can track block arguments of a method. It's based on [BlockHook](ht
 
 - [x] Easy to use.
 - [x] Keep your code clear.
-- [x] Reserve the whole arguments.
-- [x] Get return value.
-- [x] Get invoke count. 
+- [x] Let you modify return value and arguments.
 - [x] Trace all block args of method.
+- [x] Trace all `NSMallocBlock`.
 - [x] Self-managed trackers.
-- [x] Support Carthage.
+- [x] Support CocoaPods & Carthage.
 
 ## 🔮 Example
 
@@ -34,14 +33,27 @@ The sample project "BlockTrackerSample" just only support iOS platform.
 
 ## 🐒 How to use
 
+### Track blocks in method
 You can track blocks in arguments. This method returns a `BTTracker` instance for more control. You can `stop` a `BTTracker` when you don't want to track it anymore.
 
 ```
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Begin Track
-    BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallbackType type, NSInteger invokeCount, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSArray<NSString *> * _Nonnull callStackSymbols) {
-        NSLog(@"%@ invoke count = %ld", BlockTrackerCallbackTypeInvoke == type ? @"BlockTrackerCallbackTypeInvoke" : @"BlockTrackerCallbackTypeDead", (long)invokeCount);
+    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
+        switch (type) {
+            case BlockTrackerCallbackTypeBefore:
+                NSLog(@"Before block:%@, mangleName:%@", block, mangleName);
+                break;
+            case BlockTrackerCallbackTypeAfter:
+                NSLog(@"After block:%@, mangleName:%@", block, mangleName);
+                break;
+            case BlockTrackerCallbackTypeDead:
+                NSLog(@"Block Dead! mangleName:%@", mangleName);
+                break;
+            default:
+                break;
+        }
     }];
     // invoke blocks
     __block NSString *word = @"I'm a block";
@@ -59,7 +71,6 @@ You can track blocks in arguments. This method returns a `BTTracker` instance fo
 
 - (void)performBlock:(void(^)(void))block {
     block();
-//    block();
 }
 
 @end
@@ -76,7 +87,43 @@ BlockTrackerCallbackTypeDead invoke count = 1
 BlockTrackerCallbackTypeDead invoke count = 1
 ```
 
+### Track a batch of blocks.
+
+```
+setMallocBlockCallback(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
+    NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
+});
+```
+
 ## 📲 Installation
+
+### CocoaPods
+
+[CocoaPods](http://cocoapods.org) is a dependency manager for Cocoa projects. You can install it with the following command:
+
+```bash
+$ gem install cocoapods
+```
+
+To integrate BlockTracker into your Xcode project using CocoaPods, specify it in your `Podfile`:
+
+
+```
+source 'https://github.com/CocoaPods/Specs.git'
+platform :ios, '8.0'
+use_frameworks!
+target 'MyApp' do
+	pod 'BlockTracker'
+end
+```
+
+You need replace "MyApp" with your project's name.
+
+Then, run the following command:
+
+```bash
+$ pod install
+```
 
 ### Carthage
 
@@ -99,7 +146,7 @@ Run `carthage update` to build the framework and drag the built `BlockTrackerKit
 
 ### Manual
 
-After importing libffi, just add the two files `BlockTracker.h/m` to your project.
+Just drag source files in `BlockTracker` folder to your project.
 
 ## ❤️ Contributed
 

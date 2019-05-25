@@ -20,9 +20,10 @@ NS_ASSUME_NONNULL_BEGIN
  追踪回调
 
  @param block 被追踪的 block
- @param type  追踪到的类型：Invoke 或 Dead
- @param args InvokeType 下为这次执行传入 block 的参数；DeadType 下为空
- @param result InvokeType 下为这次执行 block 的返回值；DeadType 下为空
+ @param type  追踪到的类型：Before, After 或 Dead
+ @param args block 执行时的参数；Dead 时为空
+ @param result block 执行后的返回值；Dead 时为空
+ @param mangleName block invoke 函数的 mangleName，可能为空
  */
 typedef void(^BlockTrackerCallback)(id _Nullable block, BlockTrackerCallbackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSString *_Nullable mangleName);
 
@@ -71,6 +72,7 @@ Class bt_metaClass(Class cls);
  追踪方法调用中的 block 参数
  
  @param selector 追踪 block 参数所属的方法
+ @param callback block 执行前后以及销毁的回调
  @return 如果追踪成功则返回追踪者对象，否则返回 nil
  */
 - (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallback)callback;
@@ -79,7 +81,12 @@ Class bt_metaClass(Class cls);
 
 typedef void (*BlockTrackerCallbackFP)(id _Nullable, BlockTrackerCallbackType, void *_Nullable *_Null_unspecified, void *_Nullable, NSString *_Nullable);
 
-void trackAllBlocks(BlockTrackerCallback callback);
+/**
+ 追踪所有的 `NSMallocBlock`
+
+ @param callback block 执行前后以及销毁的回调
+ */
+void setMallocBlockCallback(BlockTrackerCallback callback);
 
 NS_ASSUME_NONNULL_END
 
