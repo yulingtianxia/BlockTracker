@@ -19,21 +19,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Begin Track
-    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
-        switch (type) {
-            case BlockTrackerCallbackTypeBefore:
-                NSLog(@"Before block:%@, mangleName:%@", block, mangleName);
+    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
+        switch (invocation.token.mode) {
+            case BlockHookModeBefore:
+                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
                 break;
-            case BlockTrackerCallbackTypeAfter:
-                NSLog(@"After block:%@, mangleName:%@", block, mangleName);
+            case BlockHookModeAfter:
+                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
                 break;
-            case BlockTrackerCallbackTypeDead:
-                NSLog(@"Block Dead! mangleName:%@", mangleName);
+            case BlockHookModeDead:
+                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
                 break;
             default:
                 break;
         }
     }];
+
     // invoke blocks
     __block NSString *word = @"I'm a block";
     [self performBlock:^{
@@ -45,13 +46,47 @@
 //    };
     
 //    [self performBlock:globalBlock];
-    
-    setMallocBlockCallback(^(id  _Nullable block, BlockTrackerCallbackType type, void * _Nullable * _Null_unspecified args, void * _Nullable result, NSString * _Nullable mangleName) {
-        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
+    setMallocBlockCallback(^(BHInvocation * _Nonnull invocation) {
+        //        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
+        switch (invocation.token.mode) {
+            case BlockHookModeBefore:
+                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            case BlockHookModeAfter: {
+                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                invocation.token.userInfo[@"invokeCount"] = @([invocation.token.userInfo[@"invokeCount"] integerValue] + 1);
+//                __weak typeof(invocation.token.block) weakBlock = invocation.token.block;
+//                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(10 * NSEC_PER_SEC)), dispatch_get_global_queue(QOS_CLASS_DEFAULT, 0), ^{
+//                    if (weakBlock) {
+//                        NSLog(@"Block leak after invoking! mangleName:%@", invocation.token.mangleName);
+//                    }
+//                });
+                break;
+            }
+            case BlockHookModeDead:
+                if ([invocation.token.userInfo[@"invokeCount"] integerValue] == 0) {
+                    NSLog(@"Block Dead without invoked! mangleName:%@", invocation.token.mangleName);
+                }
+                break;
+            default:
+                break;
+        }
     });
     // stop tracker in future
 //    [tracker stop];
     // blocks will die
+}
+
+- (void)increaseInvokeForBlock:(id)block
+{
+    double count = [self invokeCountOfBlock:block];
+    objc_setAssociatedObject(block, @selector(invokeCountOfBlock:), @(count + 1), OBJC_ASSOCIATION_RETAIN);
+}
+
+- (double)invokeCountOfBlock:(id)block
+{
+    NSNumber *invokeCount = objc_getAssociatedObject(block, _cmd);
+    return invokeCount.doubleValue;
 }
 
 - (void)performBlock:(void(^)(void))block {

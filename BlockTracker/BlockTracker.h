@@ -7,25 +7,15 @@
 //
 
 #import <Foundation/Foundation.h>
-
-typedef NS_ENUM(NSUInteger, BlockTrackerCallbackType) {
-    BlockTrackerCallbackTypeBefore,
-    BlockTrackerCallbackTypeAfter,
-    BlockTrackerCallbackTypeDead,
-};
+#import <BlockHook/BlockHook.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
  追踪回调
-
- @param block 被追踪的 block
- @param type  追踪到的类型：Before, After 或 Dead
- @param args block 执行时的参数；Dead 时为空
- @param result block 执行后的返回值；Dead 时为空
- @param mangleName block invoke 函数的 mangleName，可能为空
+ @param invocation 被追踪的 block 执行时的 invocation 对象，详见 BHInvocation。
  */
-typedef void(^BlockTrackerCallback)(id _Nullable block, BlockTrackerCallbackType type, void *_Nullable *_Null_unspecified args, void *_Nullable result, NSString *_Nullable mangleName);
+typedef void(^BlockTrackerCallback)(BHInvocation *invocation);
 
 /**
  获取元类

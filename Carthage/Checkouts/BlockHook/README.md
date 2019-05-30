@@ -21,6 +21,7 @@ Hook Objective-C blocks with libffi. It's a powerful AOP tool for blocks. BlockH
 
 - [Hook Objective-C Block with Libffi](http://yulingtianxia.com/blog/2018/02/28/Hook-Objective-C-Block-with-Libffi/)
 - [BlockHook with Struct](http://yulingtianxia.com/blog/2019/04/27/BlockHook-with-Struct/)
+- [BlockHook with Revocation](http://yulingtianxia.com/blog/2019/05/26/BlockHook-with-Revocation/)
 
 ## 🌟 Features
 
@@ -79,9 +80,9 @@ BHToken *tokenBefore = [block block_hookWithMode:BlockHookModeBefore usingBlock:
     NSLog(@"hook before block! invocation:%@", invocation);
 }];
     
-__unused BHToken *tokenDead = [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token){
+__unused BHToken *tokenDead = [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHInvocation *invocation){
     // BHToken is the only arg.
-    NSLog(@"block dead! token:%@", token);
+    NSLog(@"block dead! token:%@", invocation.token);
 }];
     
 NSLog(@"hooked block");

@@ -7,7 +7,6 @@
 //
 
 #import "BlockTracker.h"
-#import <BlockHook/BlockHook.h>
 #import <objc/runtime.h>
 #import <objc/message.h>
 #import <pthread.h>
@@ -432,31 +431,19 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
             
             [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
                 if (tracker.callback) {
-                    tracker.callback(invocation.token.block,
-                                     BlockTrackerCallbackTypeBefore,
-                                     invocation.args,
-                                     nil,
-                                     invocation.token.mangleName);
+                    tracker.callback(invocation);
                 }
             }];
             
             [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
                 if (tracker.callback) {
-                    tracker.callback(invocation.token.block,
-                                     BlockTrackerCallbackTypeAfter,
-                                     invocation.args,
-                                     invocation.retValue,
-                                     invocation.token.mangleName);
+                    tracker.callback(invocation);
                 }
             }];
 
-            [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHToken *token) {
+            [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHInvocation *invocation) {
                 if (tracker.callback) {
-                    tracker.callback(nil,
-                                     BlockTrackerCallbackTypeDead,
-                                     nil,
-                                     nil,
-                                     token.mangleName);
+                    tracker.callback(invocation);
                 }
             }];
             
@@ -768,30 +755,6 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
 static void *(*bt_orig_Block_copy)(const void *aBlock);
 static BlockTrackerCallback bt_blockTrackerCallback;
 
-void(^hookBefore)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_blockTrackerCallback(invocation.token.block,
-                            BlockTrackerCallbackTypeBefore,
-                            invocation.args,
-                            nil,
-                            invocation.token.mangleName);
-};
-
-void(^hookAfter)(BHInvocation *) = ^(BHInvocation *invocation) {
-    bt_blockTrackerCallback(invocation.token.block,
-                            BlockTrackerCallbackTypeAfter,
-                            invocation.args,
-                            invocation.retValue,
-                            invocation.token.mangleName);
-};
-
-void(^hookDead)(BHToken *) = ^(BHToken *token) {
-    bt_blockTrackerCallback(nil,
-                            BlockTrackerCallbackTypeDead,
-                            nil,
-                            nil,
-                            token.mangleName);
-};
-
 void *bt_replaced_Block_copy(const void *aBlock)
 {
     void *result = bt_orig_Block_copy(aBlock);
@@ -799,10 +762,13 @@ void *bt_replaced_Block_copy(const void *aBlock)
         return result;
     }
     
-    [((__bridge id)result) block_hookWithMode:BlockHookModeBefore usingBlock:hookBefore];
-    [((__bridge id)result) block_hookWithMode:BlockHookModeAfter usingBlock:hookAfter];
-    [((__bridge id)result) block_hookWithMode:BlockHookModeDead usingBlock:hookDead];
-    
+    [((__bridge id)result) block_hookWithMode:BlockHookModeBefore usingBlock:bt_blockTrackerCallback];
+    [((__bridge id)result) block_hookWithMode:BlockHookModeAfter usingBlock:bt_blockTrackerCallback];
+    [((__bridge id)result) block_hookWithMode:BlockHookModeDead usingBlock:bt_blockTrackerCallback];
+    NSString *mangleName = [(__bridge id)(result) block_currentHookToken].mangleName;
+    if ([mangleName isEqualToString:@"__29-[ViewController viewDidLoad]_block_invoke_2"]) {
+        
+    }
     NSLog(@"Hook Block mangleName:%@", [(__bridge id)(result) block_currentHookToken].mangleName);
     return result;
 }

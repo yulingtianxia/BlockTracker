@@ -40,34 +40,14 @@ struct _BHBlock
     struct _BHBlockDescriptor *descriptor;
 };
 
-@interface BHDealloc : NSObject
-
-@property (nonatomic, strong) BHToken *token;
-@property (nonatomic, nullable) BHDeadBlock deadBlock;
-
-@end
-
-@implementation BHDealloc
-
-- (void)dealloc
-{
-    if (self.deadBlock) {
-        self.deadBlock(self.token);
-    }
-}
-
-@end
-
-@interface BHInvokeLock : NSObject
+@interface BHLock : NSObject<NSLocking>
 
 @property (nonatomic) dispatch_semaphore_t semaphore;
 @property (nonatomic) os_unfair_lock unfair_lock OS_UNFAIR_LOCK_AVAILABILITY;
-- (void)lock;
-- (void)unlock;
 
 @end
 
-@implementation BHInvokeLock
+@implementation BHLock
 
 - (instancetype)init
 {
@@ -102,20 +82,20 @@ struct _BHBlock
 
 @end
 
-@interface NSObject (BHInvokeLock)
+@interface NSObject (BHLock)
 
-- (BHInvokeLock *)invokeLock;
+- (BHLock *)bh_lockForKey:(const void * _Nonnull)key;
 
 @end
 
-@implementation NSObject (BHInvokeLock)
+@implementation NSObject (BHLock)
 
-- (BHInvokeLock *)invokeLock
+- (BHLock *)bh_lockForKey:(const void * _Nonnull)key
 {
-    BHInvokeLock *lock = objc_getAssociatedObject(self, _cmd);
+    BHLock *lock = objc_getAssociatedObject(self, key);
     if (!lock) {
-        lock = [BHInvokeLock new];
-        objc_setAssociatedObject(self, _cmd, lock, OBJC_ASSOCIATION_RETAIN);
+        lock = [BHLock new];
+        objc_setAssociatedObject(self, key, lock, OBJC_ASSOCIATION_RETAIN);
     }
     return lock;
 }
@@ -131,11 +111,12 @@ struct _BHBlock
 @property (nonatomic, readwrite) BlockHookMode mode;
 @property (nonatomic) NSMutableArray *allocations;
 @property (nonatomic, weak, readwrite) id block;
-@property (nonatomic) NSUInteger numberOfArguments;
-@property (nonatomic) id hookBlock;
+@property (nonatomic, readwrite) id aspectBlock;
 @property (nonatomic, nullable, readwrite) NSString *mangleName;
 @property (nonatomic) NSMethodSignature *originalBlockSignature;
+@property (nonatomic) NSMethodSignature *aspectBlockSignature;
 @property (atomic) void *originInvoke;
+@property (nonatomic, readwrite) NSMutableDictionary *userInfo;
 
 /**
  if block is kind of `__NSStackBlock__` class.
@@ -166,36 +147,59 @@ struct _BHBlock
 
 @implementation BHToken
 
-- (instancetype)initWithBlock:(id)block mode:(BlockHookMode)mode hookBlock:(id)hookBlock
+@synthesize next = _next;
+
+- (instancetype)initWithBlock:(id)block mode:(BlockHookMode)mode aspectBlockBlock:(id)aspectBlock
 {
     self = [super init];
     if (self) {
         _allocations = [[NSMutableArray alloc] init];
         _block = block;
         const char *encode = BHBlockTypeEncodeString(block);
-        _numberOfArguments = [self _prepCIF:&_cif withEncodeString:encode];
-        if (_numberOfArguments == -1) { // Unknown encode.
+        // Check block encoding types valid.
+        NSUInteger numberOfArguments = [self _prepCIF:&_cif withEncodeString:encode];
+        if (numberOfArguments == -1) { // Unknown encode.
             return nil;
         }
+        // Check aspectBlock valid.
+        _aspectBlockSignature = [NSMethodSignature signatureWithObjCTypes:BHBlockTypeEncodeString(aspectBlock)];
+        
+        // origin block invoke func arguments: block(self), ...
+        // origin block invoke func arguments (x86 struct return): struct*, block(self), ...
+        // hook block signature arguments: block(self), invocation, ...
+        if ((mode == BlockHookModeDead && _aspectBlockSignature.numberOfArguments > 2)
+            || _aspectBlockSignature.numberOfArguments > numberOfArguments + 1) {
+            NSLog(@"Block has too many arguments. Not calling %@", self);
+            return nil;
+        }
+        _userInfo = [NSMutableDictionary dictionary];
         _originalBlockSignature = [NSMethodSignature signatureWithObjCTypes:encode];
         _closure = ffi_closure_alloc(sizeof(ffi_closure), &_replacementInvoke);
         if ([block isKindOfClass:NSClassFromString(@"__NSStackBlock")]) {
             NSLog(@"Hooking StackBlock causes a memory leak! I suggest you copy it first!");
             self.stackBlock = YES;
         }
-        
-        BHDealloc *bhDealloc = [BHDealloc new];
-        bhDealloc.token = self;
+
         [self _prepClosure];
-        objc_setAssociatedObject(block, _replacementInvoke, bhDealloc, OBJC_ASSOCIATION_RETAIN);
-        self.mode = mode;
-        self.hookBlock = hookBlock;
+        objc_setAssociatedObject(block, _replacementInvoke, self, OBJC_ASSOCIATION_RETAIN);
+        _mode = mode;
+        _aspectBlock = aspectBlock;
     }
     return self;
 }
 
 - (void)dealloc
 {
+    if (BlockHookModeDead == self.mode) {
+        BHInvocation *invocation = nil;
+        NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.aspectBlockSignature];
+        if (self.aspectBlockSignature.numberOfArguments == 2) {
+            invocation = [BHInvocation new];
+            invocation.token = self;
+            [blockInvocation setArgument:(void *)&invocation atIndex:1];
+        }
+        [blockInvocation invokeWithTarget:self.aspectBlock];
+    }
     [self remove];
     if (_closure) {
         ffi_closure_free(_closure);
@@ -205,11 +209,22 @@ struct _BHBlock
 
 - (BHToken *)next
 {
+    BHLock *lock = [self.block bh_lockForKey:@selector(next)];
+    [lock lock];
     if (!_next) {
-        BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, self.originInvoke);
-        _next = bhDealloc.token;
+        _next = objc_getAssociatedObject(self.block, self.originInvoke);
     }
-    return _next;
+    BHToken *result = _next;
+    [lock unlock];
+    return result;
+}
+
+- (void)setNext:(BHToken *)next
+{
+    BHLock *lock = [self.block bh_lockForKey:@selector(next)];
+    [lock lock];
+    _next = next;
+    [lock unlock];
 }
 
 - (BOOL)remove
@@ -218,8 +233,6 @@ struct _BHBlock
         NSLog(@"Can't remove token for StackBlock!");
         return NO;
     }
-    
-    [self setBlockDeadCallback:nil];
     if (self.originInvoke) {
         if (self.block) {
             BHToken *current = [self.block block_currentHookToken];
@@ -231,7 +244,7 @@ struct _BHBlock
                         last.next = nil;
                     }
                     else { // remove head(current) token
-                        BHInvokeLock *lock = [self.block invokeLock];
+                        BHLock *lock = [self.block bh_lockForKey:@selector(block_currentInvokeFunction)];
                         [lock lock];
                         ((__bridge struct _BHBlock *)self.block)->invoke = self.originInvoke;
                         [lock unlock];
@@ -247,24 +260,6 @@ struct _BHBlock
         return YES;
     }
     return NO;
-}
-
-- (void)setHookBlock:(id)hookBlock
-{
-    _hookBlock = hookBlock;
-    if (BlockHookModeDead == self.mode) {
-        [self setBlockDeadCallback:hookBlock];
-    }
-}
-
-- (void)setBlockDeadCallback:(BHDeadBlock)deadBlock
-{
-    if (self.isStackBlock) {
-        NSLog(@"Can't set BlockDeadCallback for StackBlock!");
-        return;
-    }
-    BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, _replacementInvoke);
-    bhDealloc.deadBlock = deadBlock;
 }
 
 - (NSString *)mangleName
@@ -325,13 +320,13 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         userArgs = args + 1;
     }
     if (BlockHookModeBefore == token.mode) {
-        [token invokeHookBlockWithArgs:userArgs retValue:userRet];
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet];
     }
-    if (!(BlockHookModeInstead == token.mode && [token invokeHookBlockWithArgs:userArgs retValue:userRet])) {
+    if (!(BlockHookModeInstead == token.mode && [token invokeAspectBlockWithArgs:userArgs retValue:userRet])) {
         [token invokeOriginalBlockWithArgs:args retValue:ret];
     }
     if (BlockHookModeAfter == token.mode) {
-        [token invokeHookBlockWithArgs:userArgs retValue:userRet];
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet];
     }
 }
 
@@ -573,32 +568,23 @@ static int BHTypeCount(const char *str)
         abort();
     }
     // exchange invoke func imp
-    BHInvokeLock *lock = [self.block invokeLock];
+    struct _BHBlock *block = (__bridge struct _BHBlock *)self.block;
+    BHLock *lock = [self.block bh_lockForKey:@selector(block_currentInvokeFunction)];
     [lock lock];
-    self.originInvoke = ((__bridge struct _BHBlock *)self.block)->invoke;
-    ((__bridge struct _BHBlock *)self.block)->invoke = _replacementInvoke;
+    self.originInvoke = block->invoke;
+    block->invoke = _replacementInvoke;
     [lock unlock];
 }
 
-- (BOOL)invokeHookBlockWithArgs:(void **)args retValue:(void *)retValue
+- (BOOL)invokeAspectBlockWithArgs:(void **)args retValue:(void *)retValue
 {
-    if ((!self.isStackBlock && !self.block) || !self.hookBlock) {
-        return NO;
-    }
-    NSMethodSignature *hookBlockSignature = [NSMethodSignature signatureWithObjCTypes:BHBlockTypeEncodeString(self.hookBlock)];
-    NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:hookBlockSignature];
-    
-    // origin block invoke func arguments: block(self), ...
-    // origin block invoke func arguments (x86 struct return): struct*, block(self), ...
-    // hook block signature arguments: block(self), invocation, ...
-    
-    if (hookBlockSignature.numberOfArguments > self.numberOfArguments + 1) {
-        NSLog(@"Block has too many arguments. Not calling %@", self);
+    if (!self.isStackBlock && !self.block) {
         return NO;
     }
     
+    NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.aspectBlockSignature];
     BHInvocation *invocation = nil;
-    if (hookBlockSignature.numberOfArguments > 1) {
+    if (self.aspectBlockSignature.numberOfArguments > 1) {
         invocation = [BHInvocation new];
         invocation.args = args;
         invocation.retValue = retValue;
@@ -607,7 +593,7 @@ static int BHTypeCount(const char *str)
     }
     
     void *argBuf = NULL;
-    for (NSUInteger idx = 2; idx < hookBlockSignature.numberOfArguments; idx++) {
+    for (NSUInteger idx = 2; idx < self.aspectBlockSignature.numberOfArguments; idx++) {
         const char *type = [self.originalBlockSignature getArgumentTypeAtIndex:idx - 1];
         NSUInteger argSize;
         NSGetSizeAndAlignment(type, &argSize, NULL);
@@ -620,7 +606,7 @@ static int BHTypeCount(const char *str)
         [blockInvocation setArgument:argBuf atIndex:idx];
     }
     
-    [blockInvocation invokeWithTarget:self.hookBlock];
+    [blockInvocation invokeWithTarget:self.aspectBlock];
     
     if (argBuf != NULL) {
         free(argBuf);
@@ -642,10 +628,10 @@ static int BHTypeCount(const char *str)
 }
 
 - (BHToken *)block_hookWithMode:(BlockHookMode)mode
-                     usingBlock:(id)block
+                     usingBlock:(id)aspectBlock
 {
     // __NSStackBlock__ -> __NSStackBlock -> NSBlock
-    if (!block || ![self block_checkValid]) {
+    if (!aspectBlock || ![self block_checkValid]) {
         return nil;
     }
     struct _BHBlock *bh_block = (__bridge void *)self;
@@ -653,7 +639,7 @@ static int BHTypeCount(const char *str)
         NSLog(@"Block has no signature! Required ABI.2010.3.16");
         return nil;
     }
-    BHToken *token = [[BHToken alloc] initWithBlock:self mode:mode hookBlock:block];
+    BHToken *token = [[BHToken alloc] initWithBlock:self mode:mode aspectBlockBlock:aspectBlock];
     return token;
 }
 
@@ -674,14 +660,13 @@ static int BHTypeCount(const char *str)
         return nil;
     }
     void *invoke = [self block_currentInvokeFunction];
-    BHDealloc *bhDealloc = objc_getAssociatedObject(self, invoke);
-    return bhDealloc.token;
+    return objc_getAssociatedObject(self, invoke);
 }
 
 - (void *)block_currentInvokeFunction
 {
     struct _BHBlock *bh_block = (__bridge void *)self;
-    BHInvokeLock *lock = [self invokeLock];
+    BHLock *lock = [self bh_lockForKey:_cmd];
     [lock lock];
     void *invoke = bh_block->invoke;
     [lock unlock];

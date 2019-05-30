@@ -16,7 +16,6 @@ typedef NS_ENUM(NSUInteger, BlockHookMode) {
 };
 
 @class BHToken;
-typedef void(^BHDeadBlock)(BHToken * _Nullable token);
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -50,7 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BlockHookMode mode;
 
 /**
- Block hooked.
+ Block be hooked.
  */
 @property (nonatomic, weak, readonly) id block;
 
@@ -65,6 +64,16 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, nullable, readonly) NSString *mangleName;
 
 /**
+ Aspect Block.
+ */
+@property (nonatomic, readonly) id aspectBlock;
+
+/**
+ A dictionary containing user-defined information relating to the token.
+ */
+@property (nonatomic, readonly) NSMutableDictionary *userInfo;
+
+/**
  Remove token will revert the hook.
 
  @return If it is successful.
@@ -73,17 +82,21 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+/**
+ BlockHook Category.
+ Method receiver must be a block.
+ */
 @interface NSObject (BlockHook)
 
 /**
  Hook this block.
 
  @param mode BlockHookMode
- @param block Implement your custom logic here.
+ @param aspectBlock Implement your custom logic here. Argument list: BHInvocation comes in first, followed by other arguments when block invoking.
  @return Token for hook.
  */
 - (nullable BHToken *)block_hookWithMode:(BlockHookMode)mode
-                              usingBlock:(id)block;
+                              usingBlock:(id)aspectBlock;
 
 /**
  Remove all hook.
