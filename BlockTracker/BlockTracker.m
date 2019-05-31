@@ -766,10 +766,7 @@ void *bt_replaced_Block_copy(const void *aBlock)
     [((__bridge id)result) block_hookWithMode:BlockHookModeAfter usingBlock:bt_blockTrackerCallback];
     [((__bridge id)result) block_hookWithMode:BlockHookModeDead usingBlock:bt_blockTrackerCallback];
     NSString *mangleName = [(__bridge id)(result) block_currentHookToken].mangleName;
-    if ([mangleName isEqualToString:@"__29-[ViewController viewDidLoad]_block_invoke_2"]) {
-        
-    }
-    NSLog(@"Hook Block mangleName:%@", [(__bridge id)(result) block_currentHookToken].mangleName);
+    NSLog(@"Hook Block mangleName:%@", mangleName);
     return result;
 }
 
