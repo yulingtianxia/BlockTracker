@@ -19,21 +19,21 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Begin Track
-//    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
-//        switch (invocation.token.mode) {
-//            case BlockHookModeBefore:
-//                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-//                break;
-//            case BlockHookModeAfter:
-//                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-//                break;
-//            case BlockHookModeDead:
-//                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
-//                break;
-//            default:
-//                break;
-//        }
-//    }];
+    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
+        switch (invocation.token.mode) {
+            case BlockHookModeBefore:
+                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            case BlockHookModeAfter:
+                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            case BlockHookModeDead:
+                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+                break;
+            default:
+                break;
+        }
+    }];
 
     setMallocBlockCallback(^(BHInvocation * _Nonnull invocation) {
         //        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
@@ -43,17 +43,10 @@
                 break;
             case BlockHookModeAfter: {
                 NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-                invocation.token.userInfo[@"invokeCount"] = @([invocation.token.userInfo[@"invokeCount"] integerValue] + 1);
                 break;
             }
             case BlockHookModeDead: {
-                NSInteger invokeCount = [invocation.token.userInfo[@"invokeCount"] integerValue];
-                if (invokeCount == 0) {
-                    NSLog(@"Block Dead without invoked! mangleName:%@", invocation.token.mangleName);
-                }
-                else {
-                    NSLog(@"Block Dead with invoke count: %ld! mangleName:%@", (long)invokeCount, invocation.token.mangleName);
-                }
+                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
                 break;
             }
             default:
