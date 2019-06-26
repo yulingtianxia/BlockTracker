@@ -429,11 +429,7 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
             // It's a weak reference.
             [tracker.blockHookTokens addObject:block];
             
-            [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:^(BHInvocation *invocation) {
-                if (tracker.callback) {
-                    tracker.callback(invocation);
-                }
-            }];
+            [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:tracker.callback];
             
             NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
         }

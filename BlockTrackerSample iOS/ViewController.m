@@ -65,6 +65,8 @@
         NSLog(@"%@", word);
     }];
     
+    
+    
     //    void(^globalBlock)(void) = ^() {
     //        NSLog(@"Global block!");
     //    };
@@ -78,7 +80,7 @@
 
 - (void)performBlock:(void(^)(void))block {
     id b = block;
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), b);
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), b);
 }
 
 @end
