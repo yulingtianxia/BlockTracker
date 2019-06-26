@@ -59,6 +59,10 @@ struct _BHBlock
 
 #pragma mark - Helper Function
 
+static bool BlockHookModeContainsMode(BlockHookMode m1, BlockHookMode m2) {
+    return ((m1 & m2) == m2);
+}
+
 __unused static struct _BHBlockDescriptor1 * _bh_Block_descriptor_1(struct _BHBlock *aBlock)
 {
     return aBlock->descriptor;
@@ -233,6 +237,7 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 @property (nonatomic, readwrite) BHToken *token;
 @property (nonatomic, readwrite) void *_Nullable *_Null_unspecified args;
 @property (nonatomic, nullable, readwrite) void *retValue;
+@property (nonatomic, readwrite) BlockHookMode mode;
 
 @end
 @implementation BHInvocation
@@ -262,15 +267,6 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         }
         // Check aspectBlock valid.
         _aspectBlockSignature = [NSMethodSignature signatureWithObjCTypes:BHBlockTypeEncodeString(aspectBlock)];
-        
-        // origin block invoke func arguments: block(self), ...
-        // origin block invoke func arguments (x86 struct return): struct*, block(self), ...
-        // hook block signature arguments: block(self), invocation, ...
-        if ((mode == BlockHookModeDead && _aspectBlockSignature.numberOfArguments > 2)
-            || _aspectBlockSignature.numberOfArguments > numberOfArguments + 1) {
-            NSLog(@"Block has too many arguments. Not calling %@", self);
-            return nil;
-        }
         _userInfo = [NSMutableDictionary dictionary];
         _originalBlockSignature = [NSMethodSignature signatureWithObjCTypes:encode];
         _closure = ffi_closure_alloc(sizeof(ffi_closure), &_replacementInvoke);
@@ -291,12 +287,13 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 
 - (void)dealloc
 {
-    if (BlockHookModeDead == self.mode) {
+    if (BlockHookModeContainsMode(self.mode, BlockHookModeDead)) {
         BHInvocation *invocation = nil;
         NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.aspectBlockSignature];
-        if (self.aspectBlockSignature.numberOfArguments == 2) {
+        if (self.aspectBlockSignature.numberOfArguments >= 2) {
             invocation = [BHInvocation new];
             invocation.token = self;
+            invocation.mode = BlockHookModeDead;
             [blockInvocation setArgument:(void *)&invocation atIndex:1];
         }
         [blockInvocation invokeWithTarget:self.aspectBlock];
@@ -397,7 +394,7 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 - (void *)_allocate:(size_t)howmuch
 {
     NSMutableData *data = [NSMutableData dataWithLength:howmuch];
-    [_allocations addObject: data];
+    [self.allocations addObject: data];
     return [data mutableBytes];
 }
 
@@ -406,10 +403,8 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     NSUInteger size, align;
     long length;
     BHSizeAndAlignment(str, &size, &align, &length);
-    ffi_type *structType = [self _allocate:size];
+    ffi_type *structType = [self _allocate:sizeof(*structType)];
     structType->type = FFI_TYPE_STRUCT;
-    structType->size = size;
-    structType->alignment = align;
     
     const char *temp = [[[NSString stringWithUTF8String:str] substringWithRange:NSMakeRange(0, length)] UTF8String];
     
@@ -417,13 +412,27 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     while (temp && *temp && *temp != '=') {
         temp++;
     }
-    ffi_type **elements = [self _typesWithEncodeString:temp + 1];
+    int elementCount = 0;
+    ffi_type **elements = [self _typesWithEncodeString:temp + 1 getCount:&elementCount startIndex:0 nullAtEnd:YES];
     if (!elements) {
         return nil;
     }
     structType->elements = elements;
-    
     return structType;
+}
+
+- (int)_countForFFIElements:(ffi_type **)elements totalSize:(NSUInteger)size
+{
+    int count = 0;
+    while (size > 0) {
+        size -= elements[count]->size;
+        count++;
+    }
+    if (size < 0) {
+        size --;
+        NSLog(@"FFI Elements Wrong Size!");
+    }
+    return count;
 }
 
 - (ffi_type *)_ffiTypeForEncode:(const char *)str
@@ -532,8 +541,13 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 
 - (ffi_type **)_typesWithEncodeString:(const char *)str getCount:(int *)outCount startIndex:(int)start
 {
+    return [self _typesWithEncodeString:str getCount:outCount startIndex:start nullAtEnd:NO];
+}
+
+- (ffi_type **)_typesWithEncodeString:(const char *)str getCount:(int *)outCount startIndex:(int)start nullAtEnd:(BOOL)nullAtEnd
+{
     int argCount = BHTypeCount(str) - start;
-    ffi_type **argTypes = [self _allocate:argCount * sizeof(*argTypes)];
+    ffi_type **argTypes = [self _allocate:(argCount + (nullAtEnd ? 1 : 0)) * sizeof(*argTypes)];
     
     int i = -start;
     while(str && *str)
@@ -553,6 +567,10 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         }
         i++;
         str = next;
+    }
+    
+    if (nullAtEnd) {
+        argTypes[argCount] = NULL;
     }
     
     if (outCount) {
@@ -611,7 +629,7 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     [lock unlock];
 }
 
-- (BOOL)invokeAspectBlockWithArgs:(void **)args retValue:(void *)retValue
+- (BOOL)invokeAspectBlockWithArgs:(void **)args retValue:(void *)retValue mode:(BlockHookMode)mode
 {
     if (!self.isStackBlock && !self.block) {
         return NO;
@@ -624,11 +642,16 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         invocation.args = args;
         invocation.retValue = retValue;
         invocation.token = self;
+        invocation.mode = mode;
         [blockInvocation setArgument:(void *)&invocation atIndex:1];
     }
     
     void *argBuf = NULL;
-    for (NSUInteger idx = 2; idx < self.aspectBlockSignature.numberOfArguments; idx++) {
+    // origin block invoke func arguments: block(self), ...
+    // origin block invoke func arguments (x86 struct return): struct*, block(self), ...
+    // hook block signature arguments: block(self), invocation, ...
+    NSUInteger numberOfArguments = MIN(self.aspectBlockSignature.numberOfArguments, self.originalBlockSignature.numberOfArguments + 1);
+    for (NSUInteger idx = 2; idx < numberOfArguments; idx++) {
         const char *type = [self.originalBlockSignature getArgumentTypeAtIndex:idx - 1];
         NSUInteger argSize;
         NSGetSizeAndAlignment(type, &argSize, NULL);
@@ -730,13 +753,13 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         // Other args move backwards.
         userArgs = args + 1;
     }
-    if (BlockHookModeBefore == token.mode) {
-        [token invokeAspectBlockWithArgs:userArgs retValue:userRet];
+    if (BlockHookModeContainsMode(token.mode, BlockHookModeBefore)) {
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeBefore];
     }
-    if (!(BlockHookModeInstead == token.mode && [token invokeAspectBlockWithArgs:userArgs retValue:userRet])) {
+    if (!(BlockHookModeContainsMode(token.mode, BlockHookModeInstead) && [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeInstead])) {
         [token invokeOriginalBlockWithArgs:args retValue:ret];
     }
-    if (BlockHookModeAfter == token.mode) {
-        [token invokeAspectBlockWithArgs:userArgs retValue:userRet];
+    if (BlockHookModeContainsMode(token.mode, BlockHookModeAfter)) {
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeAfter];
     }
 }

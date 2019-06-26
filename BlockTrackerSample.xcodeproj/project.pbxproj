@@ -155,7 +155,6 @@
 				A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */,
 				A44BACDF206BD07B007BE529 /* Products */,
 				A44BACFB206BD107007BE529 /* Frameworks */,
-				C8F35DC4A6BA2D393F53D35B /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -221,13 +220,6 @@
 				A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */,
 			);
 			path = "BlockTrackerSample macOS";
-			sourceTree = "<group>";
-		};
-		C8F35DC4A6BA2D393F53D35B /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

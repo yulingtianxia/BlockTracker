@@ -429,19 +429,7 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
             // It's a weak reference.
             [tracker.blockHookTokens addObject:block];
             
-            [block block_hookWithMode:BlockHookModeBefore usingBlock:^(BHInvocation *invocation) {
-                if (tracker.callback) {
-                    tracker.callback(invocation);
-                }
-            }];
-            
-            [block block_hookWithMode:BlockHookModeAfter usingBlock:^(BHInvocation *invocation) {
-                if (tracker.callback) {
-                    tracker.callback(invocation);
-                }
-            }];
-
-            [block block_hookWithMode:BlockHookModeDead usingBlock:^(BHInvocation *invocation) {
+            [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:^(BHInvocation *invocation) {
                 if (tracker.callback) {
                     tracker.callback(invocation);
                 }
@@ -761,12 +749,7 @@ void *bt_replaced_Block_copy(const void *aBlock)
     if (aBlock == result) {
         return result;
     }
-    
-    [((__bridge id)result) block_hookWithMode:BlockHookModeBefore usingBlock:bt_blockTrackerCallback];
-    [((__bridge id)result) block_hookWithMode:BlockHookModeAfter usingBlock:bt_blockTrackerCallback];
-    [((__bridge id)result) block_hookWithMode:BlockHookModeDead usingBlock:bt_blockTrackerCallback];
-    NSString *mangleName = [(__bridge id)(result) block_currentHookToken].mangleName;
-    NSLog(@"Hook Block mangleName:%@", mangleName);
+    [((__bridge id)result) block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:bt_blockTrackerCallback];
     return result;
 }
 

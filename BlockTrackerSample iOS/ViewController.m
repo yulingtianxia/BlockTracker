@@ -20,7 +20,7 @@
     [super viewDidLoad];
     // Begin Track
     __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
-        switch (invocation.token.mode) {
+        switch (invocation.mode) {
             case BlockHookModeBefore:
                 NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
                 break;
@@ -36,17 +36,22 @@
     }];
 
     setMallocBlockCallback(^(BHInvocation * _Nonnull invocation) {
-        //        NSLog(@"type: %lu, mangleName: %@", (unsigned long)type, mangleName);
-        switch (invocation.token.mode) {
-            case BlockHookModeBefore:
+        switch (invocation.mode) {
+            case BlockHookModeBefore: {
                 NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
                 break;
+            }
             case BlockHookModeAfter: {
                 NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
                 break;
             }
             case BlockHookModeDead: {
                 NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+                BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
+                if (!invoked) {
+                    NSLog(@"Block Not Invoked Before Dead! %@", invocation.token);
+                }
                 break;
             }
             default:

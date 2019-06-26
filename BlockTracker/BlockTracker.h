@@ -69,8 +69,6 @@ Class bt_metaClass(Class cls);
 
 @end
 
-typedef void (*BlockTrackerCallbackFP)(id _Nullable, BlockTrackerCallbackType, void *_Nullable *_Null_unspecified, void *_Nullable, NSString *_Nullable);
-
 /**
  追踪所有的 `NSMallocBlock`
 

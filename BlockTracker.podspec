@@ -21,7 +21,7 @@ s.osx.deployment_target = "10.8"
 #s.watchos.deployment_target = "1.0"
 s.requires_arc = true
 
-s.dependency 'BlockHook'
+s.dependency 'BlockHook', '~> 1.4.2'
 
 end
 

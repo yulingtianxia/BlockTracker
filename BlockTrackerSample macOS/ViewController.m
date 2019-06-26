@@ -7,26 +7,75 @@
 //
 
 #import "ViewController.h"
-
-void bt_before_Block_invoke(void) {
-    NSLog(@"Before");
-}
-void bt_after_Block_invoke(void) {
-    NSLog(@"After");
-}
-void bt_when_Block_dead(void) {
-    NSLog(@"Dead");
-}
+#import "BlockTracker.h"
+#import <objc/runtime.h>
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-
-    // Do any additional setup after loading the view.
-    trackAllBlocks(bt_before_Block_invoke, bt_after_Block_invoke, bt_when_Block_dead);
+    // Begin Track
+    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
+        switch (invocation.mode) {
+            case BlockHookModeBefore:
+                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            case BlockHookModeAfter:
+                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            case BlockHookModeDead:
+                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+                break;
+            default:
+                break;
+        }
+    }];
+    
+    setMallocBlockCallback(^(BHInvocation * _Nonnull invocation) {
+        switch (invocation.mode) {
+            case BlockHookModeBefore: {
+                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                break;
+            }
+            case BlockHookModeAfter: {
+                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
+                break;
+            }
+            case BlockHookModeDead: {
+                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+                BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
+                if (!invoked) {
+                    NSLog(@"Block Not Invoked Before Dead! %@", invocation.token);
+                }
+                break;
+            }
+            default:
+                break;
+        }
+    });
+    
+    // invoke blocks
+    NSString *word = @"I'm a block";
+    [self performBlock:^{
+        NSLog(@"%@", word);
+    }];
+    
+    //    void(^globalBlock)(void) = ^() {
+    //        NSLog(@"Global block!");
+    //    };
+    
+    //    [self performBlock:globalBlock];
+    
+    // stop tracker in future
+    //    [tracker stop];
+    // blocks will die
 }
 
+- (void)performBlock:(void(^)(void))block {
+    id b = block;
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), b);
+}
 
 - (void)setRepresentedObject:(id)representedObject {
     [super setRepresentedObject:representedObject];
