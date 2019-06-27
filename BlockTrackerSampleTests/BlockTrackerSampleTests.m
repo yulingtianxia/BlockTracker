@@ -25,6 +25,7 @@
 }
 
 - (void)testTrackMethod {
+    XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for block invoke."];
     __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
         switch (invocation.mode) {
             case BlockHookModeBefore:
@@ -50,7 +51,10 @@
     NSString *word = @"I'm a block";
     [self performBlock:^{
         NSLog(@"%@", word);
+        [expectation fulfill];
     }];
+    
+    [self waitForExpectations:@[expectation] timeout:30];
 }
 
 - (void)testTrackAllMallocBlock {
