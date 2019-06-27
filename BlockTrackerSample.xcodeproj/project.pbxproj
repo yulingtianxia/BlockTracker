@@ -17,6 +17,11 @@
 		A45040162285B5EC00DAFA1D /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; };
 		A45040172285B5EC00DAFA1D /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A47059ED206E94F200162FA7 /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A45040382285B6B000DAFA1D /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
+		A462C43322C4846D0077BC98 /* BlockTrackerSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A462C40F22C4839A0077BC98 /* BlockTrackerSampleTests.m */; };
+		A462C43422C4846E0077BC98 /* BlockTrackerSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A462C40F22C4839A0077BC98 /* BlockTrackerSampleTests.m */; };
+		A462C43522C495520077BC98 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */; };
+		A462C43622C495570077BC98 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A41F8F562281BA3900EF6553 /* BlockHook.framework */; };
+		A462C43822C4B3770077BC98 /* BlockTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = A44BACF8206BD0D2007BE529 /* BlockTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A47059F9206E955300162FA7 /* BlockTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACF9206BD0D2007BE529 /* BlockTracker.m */; };
 		A47059FA206E955900162FA7 /* BlockTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = A44BACF8206BD0D2007BE529 /* BlockTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A4D4AC7E22880E8D00FE04DB /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */; };
@@ -42,6 +47,20 @@
 			proxyType = 1;
 			remoteGlobalIDString = A47059EC206E94F200162FA7;
 			remoteInfo = "BlockTracker iOS";
+		};
+		A462C42022C484270077BC98 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A44BACDD206BD07B007BE529;
+			remoteInfo = "BlockTrackerSample iOS";
+		};
+		A462C42E22C484480077BC98 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4D4AC832288274F00FE04DB;
+			remoteInfo = "BlockTrackerSample macOS";
 		};
 		A4D4AC9A2288280300FE04DB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -92,6 +111,10 @@
 		A44BACF0206BD07B007BE529 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A44BACF8206BD0D2007BE529 /* BlockTracker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BlockTracker.h; sourceTree = "<group>"; };
 		A44BACF9206BD0D2007BE529 /* BlockTracker.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockTracker.m; sourceTree = "<group>"; };
+		A462C40F22C4839A0077BC98 /* BlockTrackerSampleTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BlockTrackerSampleTests.m; sourceTree = "<group>"; };
+		A462C41122C4839A0077BC98 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A462C41B22C484270077BC98 /* BlockTrackerSampleTests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BlockTrackerSampleTests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A462C42922C484480077BC98 /* BlockTrackerSampleTests macOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BlockTrackerSampleTests macOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A47059ED206E94F200162FA7 /* BlockTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BlockTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4D4AC7522880E0800FE04DB /* BlockTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BlockTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BlockHook.framework; path = Carthage/Build/Mac/BlockHook.framework; sourceTree = "<group>"; };
@@ -104,7 +127,6 @@
 		A4D4AC8F2288275100FE04DB /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		A4D4AC912288275100FE04DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4D4AC922288275100FE04DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = BlockTrackerSample_macOS.entitlements; sourceTree = "<group>"; };
 		A4D4ACBC229153FD00FE04DB /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 		A4D4ACBD229153FD00FE04DB /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -116,6 +138,22 @@
 			files = (
 				A45040162285B5EC00DAFA1D /* BlockTracker.framework in Frameworks */,
 				A45040382285B6B000DAFA1D /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A462C41822C484270077BC98 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A462C43622C495570077BC98 /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A462C42622C484480077BC98 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A462C43522C495520077BC98 /* BlockHook.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,6 +191,7 @@
 				A44BACF7206BD0AA007BE529 /* BlockTracker */,
 				A44BACE0206BD07B007BE529 /* BlockTrackerSample iOS */,
 				A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */,
+				A462C40E22C4839A0077BC98 /* BlockTrackerSampleTests */,
 				A44BACDF206BD07B007BE529 /* Products */,
 				A44BACFB206BD107007BE529 /* Frameworks */,
 			);
@@ -165,6 +204,8 @@
 				A47059ED206E94F200162FA7 /* BlockTracker.framework */,
 				A4D4AC7522880E0800FE04DB /* BlockTracker.framework */,
 				A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */,
+				A462C41B22C484270077BC98 /* BlockTrackerSampleTests iOS.xctest */,
+				A462C42922C484480077BC98 /* BlockTrackerSampleTests macOS.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -206,6 +247,15 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		A462C40E22C4839A0077BC98 /* BlockTrackerSampleTests */ = {
+			isa = PBXGroup;
+			children = (
+				A462C40F22C4839A0077BC98 /* BlockTrackerSampleTests.m */,
+				A462C41122C4839A0077BC98 /* Info.plist */,
+			);
+			path = BlockTrackerSampleTests;
+			sourceTree = "<group>";
+		};
 		A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */ = {
 			isa = PBXGroup;
 			children = (
@@ -217,7 +267,6 @@
 				A4D4AC8E2288275100FE04DB /* Main.storyboard */,
 				A4D4AC912288275100FE04DB /* Info.plist */,
 				A4D4AC922288275100FE04DB /* main.m */,
-				A4D4AC942288275100FE04DB /* BlockTrackerSample_macOS.entitlements */,
 			);
 			path = "BlockTrackerSample macOS";
 			sourceTree = "<group>";
@@ -239,6 +288,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				A4D4ACBF229153FE00FE04DB /* fishhook.h in Headers */,
+				A462C43822C4B3770077BC98 /* BlockTracker.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +314,42 @@
 			productName = BlockTrackerSample;
 			productReference = A44BACDE206BD07B007BE529 /* BlockTrackerSample.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A462C41A22C484270077BC98 /* BlockTrackerSampleTests iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A462C42222C484280077BC98 /* Build configuration list for PBXNativeTarget "BlockTrackerSampleTests iOS" */;
+			buildPhases = (
+				A462C41722C484270077BC98 /* Sources */,
+				A462C41822C484270077BC98 /* Frameworks */,
+				A462C41922C484270077BC98 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A462C42122C484270077BC98 /* PBXTargetDependency */,
+			);
+			name = "BlockTrackerSampleTests iOS";
+			productName = "BlockTrackerSampleTests iOS";
+			productReference = A462C41B22C484270077BC98 /* BlockTrackerSampleTests iOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A462C42822C484480077BC98 /* BlockTrackerSampleTests macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A462C43022C484480077BC98 /* Build configuration list for PBXNativeTarget "BlockTrackerSampleTests macOS" */;
+			buildPhases = (
+				A462C42522C484480077BC98 /* Sources */,
+				A462C42622C484480077BC98 /* Frameworks */,
+				A462C42722C484480077BC98 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A462C42F22C484480077BC98 /* PBXTargetDependency */,
+			);
+			name = "BlockTrackerSampleTests macOS";
+			productName = "BlockTrackerSampleTests macOS";
+			productReference = A462C42922C484480077BC98 /* BlockTrackerSampleTests macOS.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 		A47059EC206E94F200162FA7 /* BlockTracker iOS */ = {
 			isa = PBXNativeTarget;
@@ -334,6 +420,16 @@
 						CreatedOnToolsVersion = 9.2;
 						ProvisioningStyle = Automatic;
 					};
+					A462C41A22C484270077BC98 = {
+						CreatedOnToolsVersion = 10.2.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A44BACDD206BD07B007BE529;
+					};
+					A462C42822C484480077BC98 = {
+						CreatedOnToolsVersion = 10.2.1;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A4D4AC832288274F00FE04DB;
+					};
 					A47059EC206E94F200162FA7 = {
 						CreatedOnToolsVersion = 9.3;
 						ProvisioningStyle = Automatic;
@@ -345,6 +441,11 @@
 					A4D4AC832288274F00FE04DB = {
 						CreatedOnToolsVersion = 10.2.1;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.Sandbox = {
+								enabled = 0;
+							};
+						};
 					};
 				};
 			};
@@ -365,6 +466,8 @@
 				A4D4AC832288274F00FE04DB /* BlockTrackerSample macOS */,
 				A47059EC206E94F200162FA7 /* BlockTracker iOS */,
 				A4D4AC7422880E0800FE04DB /* BlockTracker macOS */,
+				A462C41A22C484270077BC98 /* BlockTrackerSampleTests iOS */,
+				A462C42822C484480077BC98 /* BlockTrackerSampleTests macOS */,
 			);
 		};
 /* End PBXProject section */
@@ -377,6 +480,20 @@
 				A44BACEE206BD07B007BE529 /* LaunchScreen.storyboard in Resources */,
 				A44BACEB206BD07B007BE529 /* Assets.xcassets in Resources */,
 				A44BACE9206BD07B007BE529 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A462C41922C484270077BC98 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A462C42722C484480077BC98 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -456,6 +573,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A462C41722C484270077BC98 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A462C43322C4846D0077BC98 /* BlockTrackerSampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A462C42522C484480077BC98 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A462C43422C4846E0077BC98 /* BlockTrackerSampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A47059E8206E94F200162FA7 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -491,6 +624,16 @@
 			isa = PBXTargetDependency;
 			target = A47059EC206E94F200162FA7 /* BlockTracker iOS */;
 			targetProxy = A45040182285B5EC00DAFA1D /* PBXContainerItemProxy */;
+		};
+		A462C42122C484270077BC98 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A44BACDD206BD07B007BE529 /* BlockTrackerSample iOS */;
+			targetProxy = A462C42022C484270077BC98 /* PBXContainerItemProxy */;
+		};
+		A462C42F22C484480077BC98 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4D4AC832288274F00FE04DB /* BlockTrackerSample macOS */;
+			targetProxy = A462C42E22C484480077BC98 /* PBXContainerItemProxy */;
 		};
 		A4D4AC9B2288280300FE04DB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -675,6 +818,106 @@
 			};
 			name = Release;
 		};
+		A462C42322C484280077BC98 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tencent.BlockTrackerSampleTests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample.app/BlockTrackerSample";
+			};
+			name = Debug;
+		};
+		A462C42422C484280077BC98 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.2;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tencent.BlockTrackerSampleTests-iOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample.app/BlockTrackerSample";
+			};
+			name = Release;
+		};
+		A462C43122C484480077BC98 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tencent.BlockTrackerSampleTests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample.app/Contents/MacOS/BlockTrackerSample";
+			};
+			name = Debug;
+		};
+		A462C43222C484480077BC98 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "Mac Developer";
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/Mac",
+				);
+				HEADER_SEARCH_PATHS = "$(inherited)";
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.tencent.BlockTrackerSampleTests-macOS";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample.app/Contents/MacOS/BlockTrackerSample";
+			};
+			name = Release;
+		};
 		A47059F6206E94F200162FA7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -815,7 +1058,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "BlockTrackerSample macOS/BlockTrackerSample_macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -832,6 +1074,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
 				PRODUCT_NAME = BlockTrackerSample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -841,7 +1084,6 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_OBJC_WEAK = YES;
-				CODE_SIGN_ENTITLEMENTS = "BlockTrackerSample macOS/BlockTrackerSample_macOS.entitlements";
 				CODE_SIGN_IDENTITY = "Mac Developer";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -857,6 +1099,7 @@
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
 				PRODUCT_NAME = BlockTrackerSample;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -878,6 +1121,24 @@
 			buildConfigurations = (
 				A44BACF5206BD07B007BE529 /* Debug */,
 				A44BACF6206BD07B007BE529 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A462C42222C484280077BC98 /* Build configuration list for PBXNativeTarget "BlockTrackerSampleTests iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A462C42322C484280077BC98 /* Debug */,
+				A462C42422C484280077BC98 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A462C43022C484480077BC98 /* Build configuration list for PBXNativeTarget "BlockTrackerSampleTests macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A462C43122C484480077BC98 /* Debug */,
+				A462C43222C484480077BC98 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

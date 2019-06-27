@@ -28,6 +28,16 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "A462C42822C484480077BC98"
+               BuildableName = "BlockTrackerSampleTests macOS.xctest"
+               BlueprintName = "BlockTrackerSampleTests macOS"
+               ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
       </Testables>
       <MacroExpansion>
          <BuildableReference
