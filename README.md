@@ -36,37 +36,36 @@ The sample project "BlockTrackerSample" just only support iOS platform.
 ### Track blocks in method
 You can track blocks in arguments. This method returns a `BTTracker` instance for more control. You can `stop` a `BTTracker` when you don't want to track it anymore.
 
-```
+```objc
 __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
-        switch (invocation.mode) {
-            case BlockHookModeBefore:
-                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-                break;
-            case BlockHookModeAfter:
-                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-                objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
-                break;
-            case BlockHookModeDead:
-                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
-                BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
-                if (!invoked) {
-                    NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
-                }
-                break;
-            default:
-                break;
-        }
-    }];
+    switch (invocation.mode) {
+        case BlockHookModeBefore:
+            NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+            break;
+        case BlockHookModeAfter:
+            NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+            objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
+            break;
+        case BlockHookModeDead:
+            NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+            BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
+            if (!invoked) {
+                NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
+            }
+            break;
+        default:
+            break;
+    }
+}];
     
-    // invoke blocks
-    NSString *word = @"I'm a block";
-    [self performBlock:^{
-        NSLog(@"%@", word);
-    }];
-    // stop tracker in future
+// invoke blocks
+NSString *word = @"I'm a block";
+[self performBlock:^{
+    NSLog(@"%@", word);
+}];
+// stop tracker in future
 //    [tracker stop];
-    // blocks will die
-}
+// blocks will die
 
 - (void)performBlock:(void(^)(void))block {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
@@ -87,30 +86,30 @@ Block Dead! mangleName:__42-[BlockTrackerSampleTests testTrackMethod]_block_invo
 
 ### Track a batch of blocks.
 
-```
+```objc
 setMallocBlockCallback(^(BHInvocation * _Nonnull invocation) {
-        switch (invocation.mode) {
-            case BlockHookModeBefore: {
-                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-                break;
-            }
-            case BlockHookModeAfter: {
-                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
-                objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
-                break;
-            }
-            case BlockHookModeDead: {
-                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
-                BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
-                if (!invoked) {
-                    NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
-                }
-                break;
-            }
-            default:
-                break;
+    switch (invocation.mode) {
+        case BlockHookModeBefore: {
+            NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+            break;
         }
-    });
+        case BlockHookModeAfter: {
+            NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+            objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
+            break;
+        }
+        case BlockHookModeDead: {
+            NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+            BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
+            if (!invoked) {
+                NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
+            }
+            break;
+        }
+        default:
+            break;
+    }
+});
 ```
 
 ## 📲 Installation
