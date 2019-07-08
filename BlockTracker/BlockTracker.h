@@ -11,6 +11,9 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+// 获取到 block 对象在参数列表中的 Index，存储在 BHInvocation.token.userInfo 字典中。
+extern NSString * const BTArgumentIndexKey;
+
 /**
  获取元类
  

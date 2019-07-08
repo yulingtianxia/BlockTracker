@@ -16,6 +16,8 @@
 #error
 #endif
 
+NSString * const BTArgumentIndexKey = @"BTArgumentIndexKey";
+
 static inline BOOL bt_object_isClass(id _Nullable obj)
 {
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_8_0 || __TV_OS_VERSION_MIN_REQUIRED >= __TVOS_9_0 || __WATCH_OS_VERSION_MIN_REQUIRED >= __WATCHOS_2_0 || __MAC_OS_X_VERSION_MIN_REQUIRED >= __MAC_10_10
@@ -431,6 +433,7 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
             if (token) {
                 // It's a weak reference.
                 [tracker.blocksAlreadyHooked addObject:block];
+                token.userInfo[BTArgumentIndexKey] = @(index.integerValue - 2);
                 NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
             }
             else {

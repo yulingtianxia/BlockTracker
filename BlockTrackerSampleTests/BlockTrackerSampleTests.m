@@ -30,14 +30,14 @@
         switch (invocation.mode) {
             case BlockHookModeBefore:
                 NSAssert(a == 1, @"参数传递错误");
-                NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                NSLog(@"Before block:%@, mangleName:%@, index:%@", invocation.token.block, invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
                 break;
             case BlockHookModeAfter:
-                NSLog(@"After block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
+                NSLog(@"After block:%@, mangleName:%@, index:%@", invocation.token.block, invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
                 objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
                 break;
             case BlockHookModeDead:
-                NSLog(@"Block Dead! mangleName:%@", invocation.token.mangleName);
+                NSLog(@"Block Dead! mangleName:%@, index:%@", invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
                 BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
                 if (!invoked) {
                     NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
