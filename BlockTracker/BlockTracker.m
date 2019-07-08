@@ -117,11 +117,11 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
 
 @interface BTTracker ()
 
-@property (nonatomic) BlockTrackerCallback callback;
+@property (nonatomic) id callback;
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 @property (nonatomic) SEL aliasSelector;
 @property (nonatomic, readwrite, getter=isActive) BOOL active;
-@property (nonatomic) NSHashTable *blockHookTokens;
+@property (nonatomic) NSHashTable *blocksAlreadyHooked;
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector;
 
 /**
@@ -141,7 +141,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
     if (self) {
         _target = target;
         _selector = selector;
-        _blockHookTokens = [NSHashTable weakObjectsHashTable];
+        _blocksAlreadyHooked = [NSHashTable weakObjectsHashTable];
     }
     return self;
 }
@@ -423,15 +423,19 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
             [invocation getArgument:&block atIndex:index.integerValue];
-            if ([tracker.blockHookTokens containsObject:block]) {
+            if ([tracker.blocksAlreadyHooked containsObject:block]) {
                 continue;
             }
-            // It's a weak reference.
-            [tracker.blockHookTokens addObject:block];
             
-            [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:tracker.callback];
-            
-            NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
+            BHToken *token = [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:tracker.callback];
+            if (token) {
+                // It's a weak reference.
+                [tracker.blocksAlreadyHooked addObject:block];
+                NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
+            }
+            else {
+                NSLog(@"Hook Block Arg Failed! Method:%@, block arg:%@", NSStringFromSelector(tracker.selector), block);
+            }
         }
     }
     invocation.selector = tracker.aliasSelector;
@@ -697,7 +701,7 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
     return [result copy];
 }
 
-- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallback)callback
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(id)callback
 {
     Method originMethod = class_getInstanceMethod([self class], selector);
     if (!originMethod) {
@@ -737,7 +741,7 @@ static void bt_executeOrigForwardInvocation(id slf, SEL selector, NSInvocation *
 @end
 
 static void *(*bt_orig_Block_copy)(const void *aBlock);
-static BlockTrackerCallback bt_blockTrackerCallback;
+static id bt_blockTrackerCallback;
 
 void *bt_replaced_Block_copy(const void *aBlock)
 {
@@ -749,7 +753,7 @@ void *bt_replaced_Block_copy(const void *aBlock)
     return result;
 }
 
-void setMallocBlockCallback(BlockTrackerCallback callback) {
+void setMallocBlockCallback(id callback) {
     bt_blockTrackerCallback = callback;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{

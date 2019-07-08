@@ -12,12 +12,6 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- 追踪回调
- @param invocation 被追踪的 block 执行时的 invocation 对象，详见 BHInvocation。
- */
-typedef void(^BlockTrackerCallback)(BHInvocation *invocation);
-
-/**
  获取元类
  
  @param cls 类对象
@@ -62,19 +56,19 @@ Class bt_metaClass(Class cls);
  追踪方法调用中的 block 参数
  
  @param selector 追踪 block 参数所属的方法
- @param callback block 执行前后以及销毁的回调
+ @param callback block 执行前后以及销毁的回调。第一个参数是 BHInvocation，后面跟着被 Track 的 block 原始的参数列表。
  @return 如果追踪成功则返回追踪者对象，否则返回 nil
  */
-- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(BlockTrackerCallback)callback;
+- (nullable BTTracker *)bt_trackBlockArgOfSelector:(SEL)selector callback:(id)callback;
 
 @end
 
 /**
  追踪所有的 `NSMallocBlock`
 
- @param callback block 执行前后以及销毁的回调
+ @param callback block 执行前后以及销毁的回调。第一个参数是 BHInvocation，后面跟着被 Track 的 block 原始的参数列表。
  */
-void setMallocBlockCallback(BlockTrackerCallback callback);
+void setMallocBlockCallback(id callback);
 
 NS_ASSUME_NONNULL_END
 

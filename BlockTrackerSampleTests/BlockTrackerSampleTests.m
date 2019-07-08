@@ -26,9 +26,10 @@
 
 - (void)testTrackMethod {
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for block invoke."];
-    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation) {
+    __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation, int a) {
         switch (invocation.mode) {
             case BlockHookModeBefore:
+                NSAssert(a == 1, @"参数传递错误");
                 NSLog(@"Before block:%@, mangleName:%@", invocation.token.block, invocation.token.mangleName);
                 break;
             case BlockHookModeAfter:
@@ -49,7 +50,7 @@
     
     // invoke blocks
     NSString *word = @"I'm a block";
-    [self performBlock:^{
+    [self performBlock:^(int a){
         NSLog(@"%@", word);
         [expectation fulfill];
     }];
@@ -83,8 +84,10 @@
     });
 }
 
-- (void)performBlock:(void(^)(void))block {
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), block);
+- (void)performBlock:(void(^)(int))block {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        block(1);
+    });
 }
 
 @end
