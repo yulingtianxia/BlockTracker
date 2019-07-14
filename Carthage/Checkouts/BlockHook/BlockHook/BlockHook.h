@@ -24,7 +24,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Token for hook.
  */
-@property (nonatomic, readonly) BHToken *token;
+@property (nonatomic, readonly, weak) BHToken *token;
 /**
  Arguments of invoking the block. Need type casting.
  */
@@ -40,9 +40,18 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) BlockHookMode mode;
 
 /**
+ YES if the receiver has retained its arguments, NO otherwise.
+ */
+@property (nonatomic, getter=isArgumentsRetained, readonly) BOOL argumentsRetained;
+/**
  Invoke original implementation of the block.
  */
 - (void)invokeOriginalBlock;
+
+/**
+ If the receiver hasn’t already done so, retains the target and all object arguments of the receiver and copies all of its C-string arguments and blocks. If a returnvalue has been set, this is also retained or copied.
+ */
+- (void)retainArguments;
 
 @end
 
@@ -122,6 +131,17 @@ NS_ASSUME_NONNULL_BEGIN
  @return Pointer to invoke function.
  */
 - (void *)block_currentInvokeFunction;
+
+typedef void(^IntercepterCompletion)(void);
+
+/**
+ Interceptor for blocks. When your interceptor completed, call `completion` callback.
+ You can call `completion` asynchronously!
+
+ @param interceptor You **MUST** call `completion` callback in interceptor, unless you want to cancel invocation.
+ @return BHToken instance.
+ */
+- (BHToken *)block_interceptor:(void (^)(BHInvocation *invocation, IntercepterCompletion completion))interceptor;
 
 @end
 

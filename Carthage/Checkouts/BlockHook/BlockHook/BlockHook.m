@@ -234,17 +234,162 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 
 @interface BHInvocation ()
 
-@property (nonatomic, readwrite) BHToken *token;
+@property (nonatomic, readwrite, weak) BHToken *token;
 @property (nonatomic, readwrite) void *_Nullable *_Null_unspecified args;
 @property (nonatomic, nullable, readwrite) void *retValue;
+@property (nonatomic) void *_Nullable *_Null_unspecified realArgs;
+@property (nonatomic, nullable) void *realRetValue;
 @property (nonatomic, readwrite) BlockHookMode mode;
+@property (nonatomic) NSMutableData *dataArgs;
+@property (nonatomic) NSMutableData *dataRet;
+@property (nonatomic) NSMutableArray *retainList;
+@property (nonatomic, getter=isArgumentsRetained, readwrite) BOOL argumentsRetained;
+@property (nonatomic) dispatch_queue_t argumentsRetainedQueue;
+@property (nonatomic) NSUInteger numberOfRealArgs;
 
 @end
+
 @implementation BHInvocation
+
+@synthesize argumentsRetained = _argumentsRetained;
+
+- (instancetype)initWithToken:(BHToken *)token
+{
+    self = [super init];
+    if (self) {
+        _token = token;
+        _argumentsRetainedQueue = dispatch_queue_create("com.blockhook.argumentsRetained", DISPATCH_QUEUE_CONCURRENT);
+        NSUInteger numberOfArguments = token.originalBlockSignature.numberOfArguments;
+        if (self.token.hasStret) {
+            numberOfArguments++;
+        }
+        _numberOfRealArgs = numberOfArguments;
+    }
+    return self;
+}
+
+#pragma mark - getter&setter
+
+- (BOOL)isArgumentsRetained
+{
+    __block BOOL temp;
+    dispatch_sync(self.argumentsRetainedQueue, ^{
+        temp = self->_argumentsRetained;
+    });
+    return temp;
+}
+
+- (void)setArgumentsRetained:(BOOL)argumentsRetained
+{
+    dispatch_barrier_async(self.argumentsRetainedQueue, ^{
+        self->_argumentsRetained = argumentsRetained;
+    });
+}
+
+#pragma mark - Public Method
 
 - (void)invokeOriginalBlock
 {
-    [self.token invokeOriginalBlockWithArgs:self.args retValue:self.retValue];
+    [self.token invokeOriginalBlockWithArgs:self.realArgs retValue:self.realRetValue];
+    if (self.isArgumentsRetained) {
+        for (NSUInteger idx = 0; idx < self.numberOfRealArgs; idx++) {
+            void *argBuf = self.realArgs[idx];
+            if (argBuf != NULL) {
+                free(argBuf);
+            }
+        }
+    }
+}
+
+- (void)retainArguments
+{
+    if (!self.isArgumentsRetained) {
+        self.dataArgs = [NSMutableData dataWithLength:self.numberOfRealArgs * sizeof(void *)];
+        self.retainList = [NSMutableArray array];
+        void **args = [self.dataArgs mutableBytes];
+        for (NSUInteger idx = 0; idx < self.numberOfRealArgs; idx++) {
+            const char *type = NULL;
+            if (self.token.hasStret) {
+                if (idx == 0) {
+                    type = self.token.originalBlockSignature.methodReturnType;
+                }
+                else {
+                    type = [self.token.originalBlockSignature getArgumentTypeAtIndex:idx - 1];
+                }
+            }
+            else {
+                type = [self.token.originalBlockSignature getArgumentTypeAtIndex:idx];
+            }
+            
+            NSUInteger argSize;
+            NSGetSizeAndAlignment(type, &argSize, NULL);
+            void *argBuf = malloc(argSize);
+            memcpy(argBuf, self.realArgs[idx], argSize);
+            args[idx] = argBuf;
+            [self _retainPointer:args[idx] encode:type];
+        }
+        self.realArgs = args;
+        if (self.token.hasStret) {
+            self.args = args + 1;
+            self.retValue = *((void **)args[0]);
+        }
+        else {
+            NSUInteger retSize = self.token.originalBlockSignature.methodReturnLength;
+            self.dataRet = [NSMutableData dataWithLength:sizeof(retSize)];
+            void *ret = [self.dataRet mutableBytes];
+            memcpy(ret, self.retValue, retSize);
+            [self _retainPointer:ret encode:self.token.originalBlockSignature.methodReturnType];
+            self.args = args;
+            self.retValue = ret;
+            self.realRetValue = ret;
+        }
+        
+        self.argumentsRetained = YES;
+    }
+}
+
+#pragma mark - Private Helper
+
+- (void)_retainPointer:(void *)pointer encode:(const char *)encode
+{
+    void *p = (*(void **)pointer);
+    if (p == NULL) {
+        return;
+    }
+    if (encode[0] == '@') {
+        id arg = (__bridge id)p;
+        if (strcmp(encode, "@?") == 0) {
+            [self.retainList addObject:[arg copy]];
+        }
+        else {
+            [self.retainList addObject:arg];
+        }
+    }
+}
+
+@end
+
+@interface BHDealloc : NSObject
+
+@property (nonatomic) BHToken *token;
+
+@end
+
+@implementation BHDealloc
+
+- (void)dealloc
+{
+    if (BlockHookModeContainsMode(self.token.mode, BlockHookModeDead)) {
+        BHInvocation *invocation = nil;
+        NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.token.aspectBlockSignature];
+        if (self.token.aspectBlockSignature.numberOfArguments >= 2) {
+            invocation = [[BHInvocation alloc] initWithToken:self.token];
+            invocation.mode = BlockHookModeDead;
+            [blockInvocation setArgument:(void *)&invocation atIndex:1];
+        }
+        [blockInvocation invokeWithTarget:self.token.aspectBlock];
+    }
+    [self.token remove];
 }
 
 @end
@@ -278,7 +423,9 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         }
 
         [self _prepClosure];
-        objc_setAssociatedObject(block, _replacementInvoke, self, OBJC_ASSOCIATION_RETAIN);
+        BHDealloc *bhDealloc = [BHDealloc new];
+        bhDealloc.token = self;
+        objc_setAssociatedObject(block, _replacementInvoke, bhDealloc, OBJC_ASSOCIATION_RETAIN);
         _mode = mode;
         _aspectBlock = aspectBlock;
     }
@@ -287,18 +434,6 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 
 - (void)dealloc
 {
-    if (BlockHookModeContainsMode(self.mode, BlockHookModeDead)) {
-        BHInvocation *invocation = nil;
-        NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.aspectBlockSignature];
-        if (self.aspectBlockSignature.numberOfArguments >= 2) {
-            invocation = [BHInvocation new];
-            invocation.token = self;
-            invocation.mode = BlockHookModeDead;
-            [blockInvocation setArgument:(void *)&invocation atIndex:1];
-        }
-        [blockInvocation invokeWithTarget:self.aspectBlock];
-    }
-    [self remove];
     if (_closure) {
         ffi_closure_free(_closure);
         _closure = NULL;
@@ -310,7 +445,8 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     BHLock *lock = [self.block bh_lockForKey:@selector(next)];
     [lock lock];
     if (!_next) {
-        _next = objc_getAssociatedObject(self.block, self.originInvoke);
+        BHDealloc *bhDealloc = objc_getAssociatedObject(self.block, self.originInvoke);
+        _next = bhDealloc.token;
     }
     BHToken *result = _next;
     [lock unlock];
@@ -394,7 +530,7 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 - (void *)_allocate:(size_t)howmuch
 {
     NSMutableData *data = [NSMutableData dataWithLength:howmuch];
-    [self.allocations addObject: data];
+    [self.allocations addObject:data];
     return [data mutableBytes];
 }
 
@@ -419,20 +555,6 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     }
     structType->elements = elements;
     return structType;
-}
-
-- (int)_countForFFIElements:(ffi_type **)elements totalSize:(NSUInteger)size
-{
-    int count = 0;
-    while (size > 0) {
-        size -= elements[count]->size;
-        count++;
-    }
-    if (size < 0) {
-        size --;
-        NSLog(@"FFI Elements Wrong Size!");
-    }
-    return count;
 }
 
 - (ffi_type *)_ffiTypeForEncode:(const char *)str
@@ -534,11 +656,6 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     return [self _typesWithEncodeString:str getCount:outCount startIndex:1];
 }
 
-- (ffi_type **)_typesWithEncodeString:(const char *)str
-{
-    return [self _typesWithEncodeString:str getCount:NULL startIndex:0];
-}
-
 - (ffi_type **)_typesWithEncodeString:(const char *)str getCount:(int *)outCount startIndex:(int)start
 {
     return [self _typesWithEncodeString:str getCount:outCount startIndex:start nullAtEnd:NO];
@@ -629,46 +746,25 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     [lock unlock];
 }
 
-- (BOOL)invokeAspectBlockWithArgs:(void **)args retValue:(void *)retValue mode:(BlockHookMode)mode
+- (BOOL)invokeAspectBlockWithArgs:(void **)args retValue:(void *)retValue mode:(BlockHookMode)mode invocation:(BHInvocation *)invocation
 {
     if (!self.isStackBlock && !self.block) {
         return NO;
     }
-    
+    invocation.mode = mode;
     NSInvocation *blockInvocation = [NSInvocation invocationWithMethodSignature:self.aspectBlockSignature];
-    BHInvocation *invocation = nil;
     if (self.aspectBlockSignature.numberOfArguments > 1) {
-        invocation = [BHInvocation new];
-        invocation.args = args;
-        invocation.retValue = retValue;
-        invocation.token = self;
-        invocation.mode = mode;
         [blockInvocation setArgument:(void *)&invocation atIndex:1];
     }
     
-    void *argBuf = NULL;
     // origin block invoke func arguments: block(self), ...
     // origin block invoke func arguments (x86 struct return): struct*, block(self), ...
     // hook block signature arguments: block(self), invocation, ...
     NSUInteger numberOfArguments = MIN(self.aspectBlockSignature.numberOfArguments, self.originalBlockSignature.numberOfArguments + 1);
     for (NSUInteger idx = 2; idx < numberOfArguments; idx++) {
-        const char *type = [self.originalBlockSignature getArgumentTypeAtIndex:idx - 1];
-        NSUInteger argSize;
-        NSGetSizeAndAlignment(type, &argSize, NULL);
-        
-        if (!(argBuf = reallocf(argBuf, argSize))) {
-            NSLog(@"Failed to allocate memory for block invocation.");
-            return NO;
-        }
-        memcpy(argBuf, args[idx - 1], argSize);
-        [blockInvocation setArgument:argBuf atIndex:idx];
+        [blockInvocation setArgument:args[idx - 1] atIndex:idx];
     }
-    
     [blockInvocation invokeWithTarget:self.aspectBlock];
-    
-    if (argBuf != NULL) {
-        free(argBuf);
-    }
     return YES;
 }
 
@@ -725,7 +821,8 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         return [dbpd->dbpd_block block_currentHookToken];
     }
     void *invoke = [self block_currentInvokeFunction];
-    return objc_getAssociatedObject(self, invoke);
+    BHDealloc *bhDealloc = objc_getAssociatedObject(self, invoke);
+    return bhDealloc.token;
 }
 
 - (void *)block_currentInvokeFunction
@@ -736,6 +833,20 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
     void *invoke = bh_block->invoke;
     [lock unlock];
     return invoke;
+}
+
+- (BHToken *)block_interceptor:(void (^)(BHInvocation *invocation, IntercepterCompletion completion))interceptor {
+    __weak typeof(interceptor) weakInterceptor = interceptor;
+    return [self block_hookWithMode:BlockHookModeInstead usingBlock:^(BHInvocation *invocation) {
+        __strong typeof(weakInterceptor) strongInterceptor = weakInterceptor;
+        if (strongInterceptor) {
+            IntercepterCompletion completion = ^() {
+                [invocation invokeOriginalBlock];
+            };
+            strongInterceptor(invocation, completion);
+            [invocation retainArguments];
+        }
+    }];
 }
 
 @end
@@ -753,13 +864,19 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         // Other args move backwards.
         userArgs = args + 1;
     }
+    *(void **)userRet = NULL;
+    BHInvocation *invocation = [[BHInvocation alloc] initWithToken:token];
+    invocation.args = userArgs;
+    invocation.retValue = userRet;
+    invocation.realArgs = args;
+    invocation.realRetValue = ret;
     if (BlockHookModeContainsMode(token.mode, BlockHookModeBefore)) {
-        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeBefore];
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeBefore invocation:invocation];
     }
-    if (!(BlockHookModeContainsMode(token.mode, BlockHookModeInstead) && [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeInstead])) {
+    if (!(BlockHookModeContainsMode(token.mode, BlockHookModeInstead) && [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeInstead invocation:invocation])) {
         [token invokeOriginalBlockWithArgs:args retValue:ret];
     }
     if (BlockHookModeContainsMode(token.mode, BlockHookModeAfter)) {
-        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeAfter];
+        [token invokeAspectBlockWithArgs:userArgs retValue:userRet mode:BlockHookModeAfter invocation:invocation];
     }
 }

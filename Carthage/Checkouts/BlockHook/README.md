@@ -22,6 +22,7 @@ Hook Objective-C blocks with libffi. It's a powerful AOP tool for blocks. BlockH
 - [Hook Objective-C Block with Libffi](http://yulingtianxia.com/blog/2018/02/28/Hook-Objective-C-Block-with-Libffi/)
 - [BlockHook with Struct](http://yulingtianxia.com/blog/2019/04/27/BlockHook-with-Struct/)
 - [BlockHook with Revocation](http://yulingtianxia.com/blog/2019/05/26/BlockHook-with-Revocation/)
+- [BlockHook with Private Data](http://yulingtianxia.com/blog/2019/06/19/BlockHook-with-Private-Data/)
 
 ## 🌟 Features
 
@@ -43,9 +44,11 @@ You can run `BlockHookSample iOS` or `BlockHookSample macOS` target.
 
 ## 🐒 How to use
 
+### Just Hook
+
 You can hook a block using 4 modes (before/instead/after/dead). This method returns a `BHToken` instance for more control. You can `remove` a `BHToken`, or set custom return value to its `retValue` property. Calling `invokeOriginalBlock` method will invoke original implementation of the block.
 
-```
+```objc
 - (BHToken *)block_hookWithMode:(BlockHookMode)mode
                      usingBlock:(id)block
 ```
@@ -54,7 +57,7 @@ BlockHook is easy to use. Its APIs take example by Aspects. [Here](https://githu
 
 This is an example for hooking block in all modes. You can change block return value from 8 to 15. Then remove some hook and check if it is successful. Finally we get callback when block dealloc. 
 
-```
+```objc
 NSObject *z = NSObject.new;
 int(^block)(int x, int y) = ^int(int x, int y) {
     int result = x + y;
@@ -115,6 +118,30 @@ hook before block! invocation:<BHInvocation: 0x60000366c7c0>
 hook after block! 3 * 5 = 8
 original result:8
 block dead! token:<BHToken: 0x600000422910>
+```
+
+### Block Interceptor
+
+Sometimes you want user login first before routing to other components. To intercept a block without hacking into code of routers, you can use block interceptor.
+
+```objc
+NSObject *testArg = [NSObject new];
+NSObject *testArg1 = [NSObject new];
+    
+NSObject *(^testblock)(NSObject *) = ^(NSObject *a) {
+    return [NSObject new];
+};
+    
+[testblock block_interceptor:^(BHInvocation *invocation, IntercepterCompletion  _Nonnull completion) {
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        __unused NSObject *arg = (__bridge NSObject *)*(void **)(invocation.args[1]);
+        NSAssert(arg == testArg, @"Async Interceptor wrong argument!");
+        *(void **)(invocation.args[1]) = (__bridge void *)(testArg1);
+        completion();
+    });
+}];
+    
+testblock(testArg);
 ```
 
 ## 📲 Installation
