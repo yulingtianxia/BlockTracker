@@ -350,9 +350,9 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 
 #pragma mark - Private Helper
 
-- (void)_retainPointer:(void *)pointer encode:(const char *)encode
+- (void)_retainPointer:(void **)pointer encode:(const char *)encode
 {
-    void *p = (*(void **)pointer);
+    void *p = *pointer;
     if (p == NULL) {
         return;
     }
@@ -364,6 +364,14 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
         else {
             [self.retainList addObject:arg];
         }
+    }
+    else if (encode[0] == '*') {
+        char *arg = p;
+        NSMutableData *data = [NSMutableData dataWithLength:sizeof(char) * strlen(arg)];
+        [self.retainList addObject:data];
+        char *str = [data mutableBytes];
+        strcpy(str, arg);
+        *pointer = str;
     }
 }
 
@@ -836,14 +844,12 @@ static void BHFFIClosureFunc(ffi_cif *cif, void *ret, void **args, void *userdat
 }
 
 - (BHToken *)block_interceptor:(void (^)(BHInvocation *invocation, IntercepterCompletion completion))interceptor {
-    __weak typeof(interceptor) weakInterceptor = interceptor;
     return [self block_hookWithMode:BlockHookModeInstead usingBlock:^(BHInvocation *invocation) {
-        __strong typeof(weakInterceptor) strongInterceptor = weakInterceptor;
-        if (strongInterceptor) {
+        if (interceptor) {
             IntercepterCompletion completion = ^() {
                 [invocation invokeOriginalBlock];
             };
-            strongInterceptor(invocation, completion);
+            interceptor(invocation, completion);
             [invocation retainArguments];
         }
     }];
