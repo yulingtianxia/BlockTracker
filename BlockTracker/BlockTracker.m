@@ -17,6 +17,7 @@
 #endif
 
 NSString * const BTArgumentIndexKey = @"BTArgumentIndexKey";
+void * const BTTrackDateAssociatedObjectKey = @"BTTrackDateAssociatedObjectKey";
 
 static inline BOOL bt_object_isClass(id _Nullable obj)
 {
@@ -123,7 +124,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
 @property (nonatomic) NSArray<NSNumber *> *blockArgIndex;
 @property (nonatomic) SEL aliasSelector;
 @property (nonatomic, readwrite, getter=isActive) BOOL active;
-@property (nonatomic) NSHashTable *blocksAlreadyHooked;
+@property (nonatomic) NSHashTable *tokens;
 - (instancetype)initWithTarget:(id)target selector:(SEL)selector;
 
 /**
@@ -143,7 +144,7 @@ static const char *BTSizeAndAlignment(const char *str, NSUInteger *sizep, NSUInt
     if (self) {
         _target = target;
         _selector = selector;
-        _blocksAlreadyHooked = [NSHashTable weakObjectsHashTable];
+        _tokens = [NSHashTable weakObjectsHashTable];
     }
     return self;
 }
@@ -425,15 +426,24 @@ static void bt_handleInvocation(NSInvocation *invocation, BTTracker *tracker)
         if (index.integerValue < invocation.methodSignature.numberOfArguments) {
             __unsafe_unretained id block;
             [invocation getArgument:&block atIndex:index.integerValue];
-            if ([tracker.blocksAlreadyHooked containsObject:block]) {
+            BHToken *alreadyHookedToken = nil;
+            for (BHToken *token in tracker.tokens.allObjects) {
+                if (token.block == block) {
+                    alreadyHookedToken = token;
+                }
+            }
+            if (alreadyHookedToken) {
+                objc_setAssociatedObject(alreadyHookedToken, BTTrackDateAssociatedObjectKey, [NSDate date], OBJC_ASSOCIATION_RETAIN);
                 continue;
             }
             
             BHToken *token = [block block_hookWithMode:BlockHookModeBefore|BlockHookModeAfter|BlockHookModeDead usingBlock:tracker.callback];
             if (token) {
                 // It's a weak reference.
-                [tracker.blocksAlreadyHooked addObject:block];
+                [tracker.tokens addObject:token];
                 token.userInfo[BTArgumentIndexKey] = @(index.integerValue - 2);
+                NSDate *now = [NSDate date];
+                objc_setAssociatedObject(token, BTTrackDateAssociatedObjectKey, now, OBJC_ASSOCIATION_RETAIN);
                 NSLog(@"Hook Block Arg mangleName:%@, in selector:%@", [block block_currentHookToken].mangleName, NSStringFromSelector(tracker.selector));
             }
             else {

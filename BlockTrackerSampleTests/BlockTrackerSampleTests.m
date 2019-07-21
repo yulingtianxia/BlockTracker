@@ -28,21 +28,26 @@
     XCTestExpectation *expectation = [[XCTestExpectation alloc] initWithDescription:@"Wait for block invoke."];
     __unused BTTracker *tracker = [self bt_trackBlockArgOfSelector:@selector(performBlock:) callback:^(BHInvocation * _Nonnull invocation, int a) {
         switch (invocation.mode) {
-            case BlockHookModeBefore:
+            case BlockHookModeBefore:{
                 NSAssert(a == 1, @"参数传递错误");
-                NSLog(@"Before block:%@, mangleName:%@, index:%@", invocation.token.block, invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
+                NSDate *startDate = objc_getAssociatedObject(invocation.token, BTTrackDateAssociatedObjectKey);
+                NSTimeInterval duration = -[startDate timeIntervalSinceNow];
+                NSLog(@"Before block:%@, mangleName:%@, index:%@, duration:%f", invocation.token.block, invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey], duration);
                 break;
-            case BlockHookModeAfter:
+            }
+            case BlockHookModeAfter:{
                 NSLog(@"After block:%@, mangleName:%@, index:%@", invocation.token.block, invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
                 objc_setAssociatedObject(invocation.token, @"invoked", @YES, OBJC_ASSOCIATION_RETAIN);
                 break;
-            case BlockHookModeDead:
+            }
+            case BlockHookModeDead:{
                 NSLog(@"Block Dead! mangleName:%@, index:%@", invocation.token.mangleName, invocation.token.userInfo[BTArgumentIndexKey]);
                 BOOL invoked = [objc_getAssociatedObject(invocation.token, @"invoked") boolValue];
                 if (!invoked) {
                     NSLog(@"Block Not Invoked Before Dead! %@", invocation.token.mangleName);
                 }
                 break;
+            }
             default:
                 break;
         }
