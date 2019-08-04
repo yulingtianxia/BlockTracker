@@ -53,9 +53,13 @@
         }
     }];
     
+    [self requestDataCompletion:^(int data) {
+        NSLog(@"%d", data);
+    }];
+    
     // invoke blocks
     NSString *word = @"I'm a block";
-    [self performBlock:^(int a){
+    [self requestDataCompletion:^(int a){
         NSLog(@"%@", word);
         [expectation fulfill];
     }];
@@ -89,9 +93,9 @@
     });
 }
 
-- (void)performBlock:(void(^)(int))block {
+- (void)requestDataCompletion:(void(^)(int))completion {
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        block(1);
+        completion(1);
     });
 }
 

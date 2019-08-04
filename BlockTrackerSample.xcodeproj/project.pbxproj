@@ -38,6 +38,21 @@
 		A4D4ACBF229153FE00FE04DB /* fishhook.h in Headers */ = {isa = PBXBuildFile; fileRef = A4D4ACBC229153FD00FE04DB /* fishhook.h */; };
 		A4D4ACC0229153FE00FE04DB /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = A4D4ACBD229153FD00FE04DB /* fishhook.c */; };
 		A4D4ACC1229153FE00FE04DB /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = A4D4ACBD229153FD00FE04DB /* fishhook.c */; };
+		A4EF7FE622F6C30C001FDFD7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EF7FE522F6C30C001FDFD7 /* AppDelegate.m */; };
+		A4EF7FE922F6C30C001FDFD7 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EF7FE822F6C30C001FDFD7 /* ViewController.m */; };
+		A4EF7FEC22F6C30C001FDFD7 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A4EF7FEA22F6C30C001FDFD7 /* Main.storyboard */; };
+		A4EF7FEE22F6C30D001FDFD7 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4EF7FED22F6C30D001FDFD7 /* Assets.xcassets */; };
+		A4EF7FF122F6C30E001FDFD7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A4EF7FF022F6C30E001FDFD7 /* main.m */; };
+		A4EF800F22F6C323001FDFD7 /* BlockTracker.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4EF800822F6C323001FDFD7 /* BlockTracker.framework */; };
+		A4EF801022F6C323001FDFD7 /* BlockTracker.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = A4EF800822F6C323001FDFD7 /* BlockTracker.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		A4EF801522F6C4A8001FDFD7 /* BlockTracker.m in Sources */ = {isa = PBXBuildFile; fileRef = A44BACF9206BD0D2007BE529 /* BlockTracker.m */; };
+		A4EF801622F6C4AD001FDFD7 /* BlockTracker.h in Headers */ = {isa = PBXBuildFile; fileRef = A44BACF8206BD0D2007BE529 /* BlockTracker.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A4EF801722F6C4B7001FDFD7 /* fishhook.c in Sources */ = {isa = PBXBuildFile; fileRef = A4D4ACBD229153FD00FE04DB /* fishhook.c */; };
+		A4EF801822F6C4BB001FDFD7 /* fishhook.h in Headers */ = {isa = PBXBuildFile; fileRef = A4D4ACBC229153FD00FE04DB /* fishhook.h */; };
+		A4EF801A22F6C548001FDFD7 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4EF801922F6C548001FDFD7 /* BlockHook.framework */; };
+		A4EF801C22F6C68B001FDFD7 /* BlockTrackerSampleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A462C40F22C4839A0077BC98 /* BlockTrackerSampleTests.m */; };
+		A4EF801D22F6C6ED001FDFD7 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4EF801922F6C548001FDFD7 /* BlockHook.framework */; };
+		A4EF801E22F6C6FC001FDFD7 /* BlockHook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A4EF801922F6C548001FDFD7 /* BlockHook.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,6 +84,20 @@
 			remoteGlobalIDString = A4D4AC7422880E0800FE04DB;
 			remoteInfo = "BlockTracker macOS";
 		};
+		A4EF7FF722F6C30E001FDFD7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4EF7FE122F6C30C001FDFD7;
+			remoteInfo = "BlockTrackerSample tvOS";
+		};
+		A4EF800D22F6C323001FDFD7 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A44BACD6206BD07B007BE529 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4EF800722F6C323001FDFD7;
+			remoteInfo = "BlockTracker tvOS";
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -90,6 +119,17 @@
 			dstSubfolderSpec = 10;
 			files = (
 				A4D4AC992288280300FE04DB /* BlockTracker.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF801422F6C323001FDFD7 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				A4EF801022F6C323001FDFD7 /* BlockTracker.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -129,6 +169,18 @@
 		A4D4AC922288275100FE04DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A4D4ACBC229153FD00FE04DB /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 		A4D4ACBD229153FD00FE04DB /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
+		A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BlockTrackerSample tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4EF7FE422F6C30C001FDFD7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		A4EF7FE522F6C30C001FDFD7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		A4EF7FE722F6C30C001FDFD7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		A4EF7FE822F6C30C001FDFD7 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		A4EF7FEB22F6C30C001FDFD7 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		A4EF7FED22F6C30D001FDFD7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A4EF7FEF22F6C30E001FDFD7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A4EF7FF022F6C30E001FDFD7 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		A4EF7FF622F6C30E001FDFD7 /* BlockTrackerSample tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BlockTrackerSample tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4EF800822F6C323001FDFD7 /* BlockTracker.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = BlockTracker.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4EF801922F6C548001FDFD7 /* BlockHook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = BlockHook.framework; path = Carthage/Build/tvOS/BlockHook.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -182,6 +234,31 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4EF7FDF22F6C30C001FDFD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF800F22F6C323001FDFD7 /* BlockTracker.framework in Frameworks */,
+				A4EF801D22F6C6ED001FDFD7 /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF7FF322F6C30E001FDFD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF801E22F6C6FC001FDFD7 /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF800522F6C323001FDFD7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF801A22F6C548001FDFD7 /* BlockHook.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -191,6 +268,7 @@
 				A44BACF7206BD0AA007BE529 /* BlockTracker */,
 				A44BACE0206BD07B007BE529 /* BlockTrackerSample iOS */,
 				A4D4AC852288274F00FE04DB /* BlockTrackerSample macOS */,
+				A4EF7FE322F6C30C001FDFD7 /* BlockTrackerSample tvOS */,
 				A462C40E22C4839A0077BC98 /* BlockTrackerSampleTests */,
 				A44BACDF206BD07B007BE529 /* Products */,
 				A44BACFB206BD107007BE529 /* Frameworks */,
@@ -206,6 +284,9 @@
 				A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */,
 				A462C41B22C484270077BC98 /* BlockTrackerSampleTests iOS.xctest */,
 				A462C42922C484480077BC98 /* BlockTrackerSampleTests macOS.xctest */,
+				A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */,
+				A4EF7FF622F6C30E001FDFD7 /* BlockTrackerSample tvOSTests.xctest */,
+				A4EF800822F6C323001FDFD7 /* BlockTracker.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -241,6 +322,7 @@
 		A44BACFB206BD107007BE529 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				A4EF801922F6C548001FDFD7 /* BlockHook.framework */,
 				A4D4AC7D22880E8C00FE04DB /* BlockHook.framework */,
 				A41F8F562281BA3900EF6553 /* BlockHook.framework */,
 			);
@@ -271,6 +353,21 @@
 			path = "BlockTrackerSample macOS";
 			sourceTree = "<group>";
 		};
+		A4EF7FE322F6C30C001FDFD7 /* BlockTrackerSample tvOS */ = {
+			isa = PBXGroup;
+			children = (
+				A4EF7FE422F6C30C001FDFD7 /* AppDelegate.h */,
+				A4EF7FE522F6C30C001FDFD7 /* AppDelegate.m */,
+				A4EF7FE722F6C30C001FDFD7 /* ViewController.h */,
+				A4EF7FE822F6C30C001FDFD7 /* ViewController.m */,
+				A4EF7FEA22F6C30C001FDFD7 /* Main.storyboard */,
+				A4EF7FED22F6C30D001FDFD7 /* Assets.xcassets */,
+				A4EF7FEF22F6C30E001FDFD7 /* Info.plist */,
+				A4EF7FF022F6C30E001FDFD7 /* main.m */,
+			);
+			path = "BlockTrackerSample tvOS";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -289,6 +386,15 @@
 			files = (
 				A4D4ACBF229153FE00FE04DB /* fishhook.h in Headers */,
 				A462C43822C4B3770077BC98 /* BlockTracker.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF800322F6C323001FDFD7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF801622F6C4AD001FDFD7 /* BlockTracker.h in Headers */,
+				A4EF801822F6C4BB001FDFD7 /* fishhook.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -407,6 +513,62 @@
 			productReference = A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */;
 			productType = "com.apple.product-type.application";
 		};
+		A4EF7FE122F6C30C001FDFD7 /* BlockTrackerSample tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4EF7FFD22F6C30E001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTrackerSample tvOS" */;
+			buildPhases = (
+				A4EF7FDE22F6C30C001FDFD7 /* Sources */,
+				A4EF7FDF22F6C30C001FDFD7 /* Frameworks */,
+				A4EF7FE022F6C30C001FDFD7 /* Resources */,
+				A4EF801422F6C323001FDFD7 /* Embed Frameworks */,
+				A4EF801B22F6C574001FDFD7 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4EF800E22F6C323001FDFD7 /* PBXTargetDependency */,
+			);
+			name = "BlockTrackerSample tvOS";
+			productName = "BlockTrackerSample tvOS";
+			productReference = A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A4EF7FF522F6C30E001FDFD7 /* BlockTrackerSample tvOSTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4EF800022F6C30E001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTrackerSample tvOSTests" */;
+			buildPhases = (
+				A4EF7FF222F6C30E001FDFD7 /* Sources */,
+				A4EF7FF322F6C30E001FDFD7 /* Frameworks */,
+				A4EF7FF422F6C30E001FDFD7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4EF7FF822F6C30E001FDFD7 /* PBXTargetDependency */,
+			);
+			name = "BlockTrackerSample tvOSTests";
+			productName = "BlockTrackerSample tvOSTests";
+			productReference = A4EF7FF622F6C30E001FDFD7 /* BlockTrackerSample tvOSTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		A4EF800722F6C323001FDFD7 /* BlockTracker tvOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4EF801122F6C323001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTracker tvOS" */;
+			buildPhases = (
+				A4EF800322F6C323001FDFD7 /* Headers */,
+				A4EF800422F6C323001FDFD7 /* Sources */,
+				A4EF800522F6C323001FDFD7 /* Frameworks */,
+				A4EF800622F6C323001FDFD7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "BlockTracker tvOS";
+			productName = "BlockTracker tvOS";
+			productReference = A4EF800822F6C323001FDFD7 /* BlockTracker.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -447,6 +609,19 @@
 							};
 						};
 					};
+					A4EF7FE122F6C30C001FDFD7 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Automatic;
+					};
+					A4EF7FF522F6C30E001FDFD7 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Automatic;
+						TestTargetID = A4EF7FE122F6C30C001FDFD7;
+					};
+					A4EF800722F6C323001FDFD7 = {
+						CreatedOnToolsVersion = 10.3;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = A44BACD9206BD07B007BE529 /* Build configuration list for PBXProject "BlockTrackerSample" */;
@@ -464,10 +639,13 @@
 			targets = (
 				A44BACDD206BD07B007BE529 /* BlockTrackerSample iOS */,
 				A4D4AC832288274F00FE04DB /* BlockTrackerSample macOS */,
+				A4EF7FE122F6C30C001FDFD7 /* BlockTrackerSample tvOS */,
 				A47059EC206E94F200162FA7 /* BlockTracker iOS */,
 				A4D4AC7422880E0800FE04DB /* BlockTracker macOS */,
+				A4EF800722F6C323001FDFD7 /* BlockTracker tvOS */,
 				A462C41A22C484270077BC98 /* BlockTrackerSampleTests iOS */,
 				A462C42822C484480077BC98 /* BlockTrackerSampleTests macOS */,
+				A4EF7FF522F6C30E001FDFD7 /* BlockTrackerSample tvOSTests */,
 			);
 		};
 /* End PBXProject section */
@@ -520,6 +698,29 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4EF7FE022F6C30C001FDFD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF7FEE22F6C30D001FDFD7 /* Assets.xcassets in Resources */,
+				A4EF7FEC22F6C30C001FDFD7 /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF7FF422F6C30E001FDFD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF800622F6C323001FDFD7 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -551,6 +752,24 @@
 			);
 			inputPaths = (
 				"$(SRCROOT)/Carthage/Build/Mac/BlockHook.framework",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Type a script or drag a script file from your workspace to insert its path.\n/usr/local/bin/carthage copy-frameworks\n";
+		};
+		A4EF801B22F6C574001FDFD7 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/tvOS/BlockHook.framework",
 			);
 			outputFileListPaths = (
 			);
@@ -617,6 +836,33 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A4EF7FDE22F6C30C001FDFD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF7FE922F6C30C001FDFD7 /* ViewController.m in Sources */,
+				A4EF7FF122F6C30E001FDFD7 /* main.m in Sources */,
+				A4EF7FE622F6C30C001FDFD7 /* AppDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF7FF222F6C30E001FDFD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF801C22F6C68B001FDFD7 /* BlockTrackerSampleTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4EF800422F6C323001FDFD7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4EF801722F6C4B7001FDFD7 /* fishhook.c in Sources */,
+				A4EF801522F6C4A8001FDFD7 /* BlockTracker.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -639,6 +885,16 @@
 			isa = PBXTargetDependency;
 			target = A4D4AC7422880E0800FE04DB /* BlockTracker macOS */;
 			targetProxy = A4D4AC9A2288280300FE04DB /* PBXContainerItemProxy */;
+		};
+		A4EF7FF822F6C30E001FDFD7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4EF7FE122F6C30C001FDFD7 /* BlockTrackerSample tvOS */;
+			targetProxy = A4EF7FF722F6C30E001FDFD7 /* PBXContainerItemProxy */;
+		};
+		A4EF800E22F6C323001FDFD7 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4EF800722F6C323001FDFD7 /* BlockTracker tvOS */;
+			targetProxy = A4EF800D22F6C323001FDFD7 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -663,6 +919,14 @@
 			isa = PBXVariantGroup;
 			children = (
 				A4D4AC8F2288275100FE04DB /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		A4EF7FEA22F6C30C001FDFD7 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A4EF7FEB22F6C30C001FDFD7 /* Base */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -1104,6 +1368,163 @@
 			};
 			name = Release;
 		};
+		A4EF7FFE22F6C30E001FDFD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = "BlockTrackerSample tvOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 12.4;
+			};
+			name = Debug;
+		};
+		A4EF7FFF22F6C30E001FDFD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = "App Icon & Top Shelf Image";
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = "BlockTrackerSample tvOS/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 12.4;
+			};
+			name = Release;
+		};
+		A4EF800122F6C30E001FDFD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yulingtianxia.BlockTrackerSample-tvOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample tvOS.app/BlockTrackerSample tvOS";
+				TVOS_DEPLOYMENT_TARGET = 12.4;
+			};
+			name = Debug;
+		};
+		A4EF800222F6C30E001FDFD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = BlockTrackerSampleTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.yulingtianxia.BlockTrackerSample-tvOSTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = appletvos;
+				TARGETED_DEVICE_FAMILY = 3;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BlockTrackerSample tvOS.app/BlockTrackerSample tvOS";
+				TVOS_DEPLOYMENT_TARGET = 12.4;
+			};
+			name = Release;
+		};
+		A4EF801222F6C323001FDFD7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = BlockTracker/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTracker;
+				PRODUCT_NAME = BlockTracker;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Debug;
+		};
+		A4EF801322F6C323001FDFD7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = YES;
+				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				DYLIB_COMPATIBILITY_VERSION = 1;
+				DYLIB_CURRENT_VERSION = 1;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/tvOS",
+				);
+				INFOPLIST_FILE = BlockTracker/Info.plist;
+				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTracker;
+				PRODUCT_NAME = BlockTracker;
+				SDKROOT = appletvos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 3;
+				TVOS_DEPLOYMENT_TARGET = 9.0;
+				VERSIONING_SYSTEM = "apple-generic";
+				VERSION_INFO_PREFIX = "";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1166,6 +1587,33 @@
 			buildConfigurations = (
 				A4D4AC962288275100FE04DB /* Debug */,
 				A4D4AC972288275100FE04DB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4EF7FFD22F6C30E001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTrackerSample tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4EF7FFE22F6C30E001FDFD7 /* Debug */,
+				A4EF7FFF22F6C30E001FDFD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4EF800022F6C30E001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTrackerSample tvOSTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4EF800122F6C30E001FDFD7 /* Debug */,
+				A4EF800222F6C30E001FDFD7 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4EF801122F6C323001FDFD7 /* Build configuration list for PBXNativeTarget "BlockTracker tvOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4EF801222F6C323001FDFD7 /* Debug */,
+				A4EF801322F6C323001FDFD7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
