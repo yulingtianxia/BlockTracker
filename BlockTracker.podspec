@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 s.name         = "BlockTracker"
-s.version      = "1.1.0"
+s.version      = "1.1.1"
 s.summary      = "Tracking block args of Objective-C method based on BlockHook"
 s.description  = <<-DESC
 BlockTracker can track block arguments of a method. It's based on BlockHook.
@@ -20,6 +20,7 @@ s.osx.deployment_target = "10.8"
 s.tvos.deployment_target = "9.0"
 #s.watchos.deployment_target = "1.0"
 s.requires_arc = true
+s.static_framework = true
 
 s.dependency 'BlockHook', '~> 1.5.4'
 

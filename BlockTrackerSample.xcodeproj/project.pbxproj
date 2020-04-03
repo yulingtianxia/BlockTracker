@@ -169,7 +169,7 @@
 		A4D4AC922288275100FE04DB /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		A4D4ACBC229153FD00FE04DB /* fishhook.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fishhook.h; sourceTree = "<group>"; };
 		A4D4ACBD229153FD00FE04DB /* fishhook.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = fishhook.c; sourceTree = "<group>"; };
-		A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BlockTrackerSample tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockTrackerSample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4EF7FE422F6C30C001FDFD7 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		A4EF7FE522F6C30C001FDFD7 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		A4EF7FE722F6C30C001FDFD7 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
@@ -284,7 +284,7 @@
 				A4D4AC842288274F00FE04DB /* BlockTrackerSample.app */,
 				A462C41B22C484270077BC98 /* BlockTrackerSampleTests iOS.xctest */,
 				A462C42922C484480077BC98 /* BlockTrackerSampleTests macOS.xctest */,
-				A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */,
+				A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample.app */,
 				A4EF7FF622F6C30E001FDFD7 /* BlockTrackerSample tvOSTests.xctest */,
 				A4EF800822F6C323001FDFD7 /* BlockTracker.framework */,
 			);
@@ -530,7 +530,7 @@
 			);
 			name = "BlockTrackerSample tvOS";
 			productName = "BlockTrackerSample tvOS";
-			productReference = A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample tvOS.app */;
+			productReference = A4EF7FE222F6C30C001FDFD7 /* BlockTrackerSample.app */;
 			productType = "com.apple.product-type.application";
 		};
 		A4EF7FF522F6C30E001FDFD7 /* BlockTrackerSample tvOSTests */ = {
@@ -575,7 +575,7 @@
 		A44BACD6206BD07B007BE529 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1020;
+				LastUpgradeCheck = 1130;
 				ORGANIZATIONNAME = "杨萧玉";
 				TargetAttributes = {
 					A44BACDD206BD07B007BE529 = {
@@ -1326,6 +1326,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
@@ -1352,6 +1353,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEVELOPMENT_TEAM = D3RCVUP6VH;
+				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/Carthage/Build/Mac",
@@ -1385,7 +1387,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BlockTrackerSample;
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 12.4;
@@ -1408,7 +1410,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = com.yulingtianxia.BlockTrackerSample;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BlockTrackerSample;
 				SDKROOT = appletvos;
 				TARGETED_DEVICE_FAMILY = 3;
 				TVOS_DEPLOYMENT_TARGET = 12.4;
