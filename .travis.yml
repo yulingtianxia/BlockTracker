@@ -1,8 +1,8 @@
-osx_image: xcode10.2
+osx_image: xcode12.4
 language: objective-c
 xcode_project: BlockTrackerSample
 xcode_scheme: BlockTracker
-xcode_sdk: iphoneos12.2
+xcode_sdk: iphoneos14.4
 env:
   global:
   - FRAMEWORK_NAME=BlockTracker
@@ -16,7 +16,7 @@ before_deploy:
 - carthage build --no-skip-current
 - carthage archive $FRAMEWORK_NAME
 script: 
-- xcodebuild -project BlockTrackerSample.xcodeproj -scheme "BlockTrackerSample iOS" -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone X,OS=12.2' ONLY_ACTIVE_ARCH=NO GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES build test
+- xcodebuild -project BlockTrackerSample.xcodeproj -scheme "BlockTrackerSample iOS" -configuration Release -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone X,OS=14.4' ONLY_ACTIVE_ARCH=NO GCC_INSTRUMENT_PROGRAM_FLOW_ARCS=YES GCC_GENERATE_TEST_COVERAGE_FILES=YES build test
 deploy:
   provider: releases
   api_key:
