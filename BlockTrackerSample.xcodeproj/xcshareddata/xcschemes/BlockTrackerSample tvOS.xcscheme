@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "A4EF7FE122F6C30C001FDFD7"
-               BuildableName = "BlockTrackerSample tvOS.app"
+               BuildableName = "BlockTrackerSample.app"
                BlueprintName = "BlockTrackerSample tvOS"
                ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
             </BuildableReference>
@@ -31,7 +31,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A4EF7FE122F6C30C001FDFD7"
-            BuildableName = "BlockTrackerSample tvOS.app"
+            BuildableName = "BlockTrackerSample.app"
             BlueprintName = "BlockTrackerSample tvOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
@@ -64,7 +64,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A4EF7FE122F6C30C001FDFD7"
-            BuildableName = "BlockTrackerSample tvOS.app"
+            BuildableName = "BlockTrackerSample.app"
             BlueprintName = "BlockTrackerSample tvOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
@@ -81,7 +81,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "A4EF7FE122F6C30C001FDFD7"
-            BuildableName = "BlockTrackerSample tvOS.app"
+            BuildableName = "BlockTrackerSample.app"
             BlueprintName = "BlockTrackerSample tvOS"
             ReferencedContainer = "container:BlockTrackerSample.xcodeproj">
          </BuildableReference>
